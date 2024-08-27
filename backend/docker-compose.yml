@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8000:8080"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - auth
+      - cloud
+
+  auth:
+    image: auth_server
+    container_name: auth
+    ports:
+      - "8070:8000"
+    environment:
+      - MONGO_URL=mongodb://mongo_auth:27017
+    depends_on:
+      - mongo_auth
+
+  cloud:
+    image: cloud_server
+    container_name: cloud
+    ports:
+      - "8090:8000"
+    environment:
+      - MONGO_URL=mongodb://mongo_cloud:27017
+    depends_on:
+      - mongo_cloud
+
+  mongo_auth:
+    image: mongo:latest
+    container_name: auth_db
+    ports:
+      - "27018:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root123.
+    volumes:
+      - ./mongo_auth_p:/data/db
+
+  mongo_cloud:
+    image: mongo:latest
+    container_name: cloud_db
+    ports:
+      - "27019:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root123.
+    volumes:
+      - ./mongo_cloud_p:/data/db
+
+volumes:
+  mongo_auth_p:
+    driver: local
+  mongo_cloud_p:
+    driver: local

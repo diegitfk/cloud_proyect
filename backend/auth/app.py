@@ -5,6 +5,7 @@ from typing import Annotated
 import jwt
 import zipfile
 import subprocess
+import pymongo
 
 """
     ### Finalidad de este archivo
@@ -38,7 +39,7 @@ async def login() -> None:
 
 @app.post("/create_dir/{name_dir}")
 async def creating_a_dir(name_dir : Annotated[str , Path(...)]) -> None:
-    result = subprocess.run(["mkdir" , f"/test_extract/{name_dir}"] , capture_output=True, text=True)
+    result = subprocess.run(["mkdir" , f"{name_dir}"] , capture_output=True, text=True)
     print(result.stdout , result.stderr)
 
 @app.post("/upload_files")
