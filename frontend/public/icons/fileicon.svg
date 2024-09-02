@@ -1,5 +1,4 @@
- <svg
-      {...props}
+<svg
       xmlns="http://www.w3.org/2000/svg"
       width="24"
       height="24"
@@ -10,7 +9,6 @@
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <polyline points="18 8 22 12 18 16" />
-      <polyline points="6 8 2 12 6 16" />
-      <line x1="2" x2="22" y1="12" y2="12" />
+      <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+      <path d="M14 2v4a2 2 0 0 0 2 2h4" />
     </svg>

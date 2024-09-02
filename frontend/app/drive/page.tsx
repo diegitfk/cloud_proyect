@@ -1,18 +1,18 @@
 import Link from "next/link"
-import { Button } from "@/app/ui/button"
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from "@/app/ui/dropdown-menu"
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/app/ui/breadcrumb"
-import { Card, CardHeader, CardContent } from "@/app/ui/card"
-import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from "@/app/ui/drawer"
 import Image from "next/image"
-import bellIcon from "@/public/notification.svg"
+import { Button } from "@/components/ui/button"
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from "@/components/ui/dropdown-menu"
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb"
+import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from "@/components/ui/drawer"
+import LogoCloudingDrive from "@/public/icons/cloudicon.svg";
+import CardsDrive from "@/components/custom/cardsDrive"
 
 export default function PageDrive() {
   return (
     <div className="flex h-screen w-full flex-col">
       <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center border-b bg-background px-4 md:px-6">
         <Link href="#" className="mr-6 flex items-center gap-2" prefetch={false}>
-          <HardDriveIcon className="h-6 w-6" />
+          <LogoCloudingDrive width={38} height={38} />
           <span className="text-lg font-semibold">CloudingDrive</span>
         </Link>
         <nav className="ml-auto flex items-center gap-4">
@@ -31,14 +31,13 @@ export default function PageDrive() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="rounded-full">
-                <img
-                  src="/placeholder.svg"
+                <Image src="/icons/placeholder.svg"
                   width={32}
                   height={32}
                   alt="Avatar"
                   className="rounded-full"
-                  style={{ aspectRatio: "32/32", objectFit: "cover" }}
-                />
+                  style={{ aspectRatio: "32/32", objectFit: "cover" }}>
+                </Image>
                 <span className="sr-only">Menú de Usuario</span>
               </Button>
             </DropdownMenuTrigger>
@@ -125,153 +124,11 @@ export default function PageDrive() {
                 <ListIcon className="h-5 w-5" />
                 <span className="sr-only">List view</span>
               </Button>
-              <Button variant="ghost" size="icon" className="rounded-full">
-                <FilterIcon className="h-5 w-5" />
-                <span className="sr-only">Filter</span>
-              </Button>
             </div>
           </div>
           <div className="flex-1 overflow-auto p-4 md:px-6">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              <Card className="group">
-                <CardHeader className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <FileIcon className="h-6 w-6" />
-                    <div className="text-sm font-medium">Document.docx</div>
-                  </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="rounded-full">
-                        <MoveHorizontalIcon className="h-4 w-4" />
-                        <span className="sr-only">More options</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>Open</DropdownMenuItem>
-                      <DropdownMenuItem>Share</DropdownMenuItem>
-                      <DropdownMenuItem>Download</DropdownMenuItem>
-                      <DropdownMenuItem>Rename</DropdownMenuItem>
-                      <DropdownMenuItem>Move to</DropdownMenuItem>
-                      <DropdownMenuItem>Remove</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </CardHeader>
-                <CardContent className="flex flex-col items-center justify-center gap-2 p-4">
-                  <img
-                    src="/placeholder.svg"
-                    width="100"
-                    height="100"
-                    alt="Document"
-                    className="rounded"
-                    style={{ aspectRatio: "100/100", objectFit: "cover" }}
-                  />
-                  <div className="text-sm text-muted-foreground">Last modified 2 days ago</div>
-                </CardContent>
-              </Card>
-              <Card className="group">
-                <CardHeader className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <FolderIcon className="h-6 w-6" />
-                    <div className="text-sm font-medium">Documents</div>
-                  </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="rounded-full">
-                        <MoveHorizontalIcon className="h-4 w-4" />
-                        <span className="sr-only">More options</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>Abrir</DropdownMenuItem>
-                      <DropdownMenuItem>Compartir</DropdownMenuItem>
-                      <DropdownMenuItem>Renombrar</DropdownMenuItem>
-                      <DropdownMenuItem>Mover a</DropdownMenuItem>
-                      <DropdownMenuItem>Eliminar</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </CardHeader>
-                <CardContent className="flex flex-col items-center justify-center gap-2 p-4">
-                  <img
-                    src="/placeholder.svg"
-                    width="100"
-                    height="100"
-                    alt="Folder"
-                    className="rounded"
-                    style={{ aspectRatio: "100/100", objectFit: "cover" }}
-                  />
-                  <div className="text-sm text-muted-foreground">Last modified 1 week ago</div>
-                </CardContent>
-              </Card>
-              <Card className="group">
-                <CardHeader className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <FileIcon className="h-6 w-6" />
-                    <div className="text-sm font-medium">Presentation.pptx</div>
-                  </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="rounded-full">
-                        <MoveHorizontalIcon className="h-4 w-4" />
-                        <span className="sr-only">More options</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>Open</DropdownMenuItem>
-                      <DropdownMenuItem>Share</DropdownMenuItem>
-                      <DropdownMenuItem>Download</DropdownMenuItem>
-                      <DropdownMenuItem>Rename</DropdownMenuItem>
-                      <DropdownMenuItem>Move to</DropdownMenuItem>
-                      <DropdownMenuItem>Remove</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </CardHeader>
-                <CardContent className="flex flex-col items-center justify-center gap-2 p-4">
-                  <img
-                    src="/placeholder.svg"
-                    width="100"
-                    height="100"
-                    alt="Presentation"
-                    className="rounded"
-                    style={{ aspectRatio: "100/100", objectFit: "cover" }}
-                  />
-                  <div className="text-sm text-muted-foreground">Last modified 3 days ago</div>
-                </CardContent>
-              </Card>
-              <Card className="group">
-                <CardHeader className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <FileIcon className="h-6 w-6" />
-                    <div className="text-sm font-medium">Image.jpg</div>
-                  </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="rounded-full">
-                        <MoveHorizontalIcon className="h-4 w-4" />
-                        <span className="sr-only">More options</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>Open</DropdownMenuItem>
-                      <DropdownMenuItem>Share</DropdownMenuItem>
-                      <DropdownMenuItem>Download</DropdownMenuItem>
-                      <DropdownMenuItem>Rename</DropdownMenuItem>
-                      <DropdownMenuItem>Move to</DropdownMenuItem>
-                      <DropdownMenuItem>Remove</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </CardHeader>
-                <CardContent className="flex flex-col items-center justify-center gap-2 p-4">
-                  <img
-                    src="/placeholder.svg"
-                    width="100"
-                    height="100"
-                    alt="Image"
-                    className="rounded"
-                    style={{ aspectRatio: "100/100", objectFit: "cover" }}
-                  />
-                  <div className="text-sm text-muted-foreground">Last modified 1 month ago</div>
-                </CardContent>
-              </Card>
+              <CardsDrive />
             </div>
           </div>
         </div>
@@ -308,10 +165,9 @@ export default function PageDrive() {
   )
 }
 
-function BellIcon(props) {
+function BellIcon() {
   return (
     <svg
-      {...props}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
       height="24"
@@ -328,10 +184,9 @@ function BellIcon(props) {
   );
 }
 
-function FileIcon(props) {
+function FileIcon() {
   return (
     <svg
-      {...props}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
       height="24"
@@ -347,30 +202,9 @@ function FileIcon(props) {
     </svg>
   );
 }
-
-function FilterIcon(props) {
+function FolderIcon() {
   return (
     <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
-    </svg>
-  );
-}
-
-function FolderIcon(props) {
-  return (
-    <svg
-      {...props}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
       height="24"
@@ -386,19 +220,18 @@ function FolderIcon(props) {
   );
 }
 
-function HardDriveIcon(props) {
+function HardDriveIcon() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
       <title>{"CountingWorks PRO"}</title>
       <path d="M11.327.512c-3.806.034-7.447 3.19-7.181 7.75.102 1.547.88 3.382 2.981 5.733a.365.365 0 0 0 .635-.23l.053-2.266a.36.36 0 0 0-.1-.255 5.047 5.047 0 0 1 3.407-8.502c2.27-.104 4.011 1.236 4.753 2.744.34.693.527 1.45.55 2.222a.357.357 0 0 0 .343.344c.482.015.962.064 1.437.147a.359.359 0 0 0 .424-.344 7.237 7.237 0 0 0-2.769-5.788C15.02 1.404 13.564.52 11.327.512zm4.94 8.362a14.8 14.8 0 0 0-2.515.26.364.364 0 0 0-.17.635l1.695 1.435a.36.36 0 0 0 .316.073 5.026 5.026 0 0 1 3.123.281c1.78.787 2.92 2.414 3.042 4.304.208 3.187-2.48 5.539-5.277 5.37a5.032 5.032 0 0 1-1.751-.412.365.365 0 0 0-.443.115c-.289.385-.603.75-.94 1.094a.367.367 0 0 0 .09.573c1.887 1.073 3.936 1.16 6.014.32 3.303-1.304 4.63-4.523 4.545-6.847-.096-2.641-1.48-5.072-4.085-6.402-.921-.47-2.04-.812-3.643-.799zm-12.931 1.2a.364.364 0 0 0-.152.052c-1.41.827-2.216 2.057-2.798 3.777-.285.892-.386 1.51-.386 2.436a7.276 7.276 0 0 0 7.157 7.141c1.129.017 2.104-.235 2.962-.583 1.45-.62 3.142-1.597 4.65-4.912a.363.363 0 0 0-.459-.489l-2.365.867a.357.357 0 0 0-.195.174 5.03 5.03 0 0 1-2.268 2.224C6 22.428 2.473 19.784 2.235 16.74c-.145-1.741.494-3.053 1.37-3.982.293-.308.41-.477.663-.662a.36.36 0 0 0 .098-.471 9.173 9.173 0 0 1-.653-1.326.366.366 0 0 0-.377-.225z" />
     </svg>
   );
 }
 
-function HomeIcon(props) {
+function HomeIcon() {
   return (
     <svg
-      {...props}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
       height="24"
@@ -415,10 +248,9 @@ function HomeIcon(props) {
   );
 }
 
-function LayoutGridIcon(props) {
+function LayoutGridIcon() {
   return (
     <svg
-      {...props}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
       height="24"
@@ -437,10 +269,9 @@ function LayoutGridIcon(props) {
   );
 }
 
-function ListIcon(props) {
+function ListIcon() {
   return (
     <svg
-      {...props}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
       height="24"
@@ -461,31 +292,9 @@ function ListIcon(props) {
   );
 }
 
-function MoveHorizontalIcon(props) {
+function PlusIcon() {
   return (
     <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polyline points="18 8 22 12 18 16" />
-      <polyline points="6 8 2 12 6 16" />
-      <line x1="2" x2="22" y1="12" y2="12" />
-    </svg>
-  );
-}
-
-function PlusIcon(props) {
-  return (
-    <svg
-      {...props}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
       height="24"
@@ -502,10 +311,9 @@ function PlusIcon(props) {
   );
 }
 
-function SearchIcon(props) {
+function SearchIcon() {
   return (
     <svg
-      {...props}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
       height="24"
@@ -522,10 +330,9 @@ function SearchIcon(props) {
   );
 }
 
-function StarIcon(props) {
+function StarIcon() {
   return (
     <svg
-      {...props}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
       height="24"
@@ -541,10 +348,9 @@ function StarIcon(props) {
   );
 }
 
-function TrashIcon(props) {
+function TrashIcon() {
   return (
     <svg
-      {...props}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
       height="24"
@@ -562,10 +368,10 @@ function TrashIcon(props) {
   );
 }
 
-function UploadIcon(props) {
+function UploadIcon() {
   return (
     <svg
-      {...props}
+
       xmlns="http://www.w3.org/2000/svg"
       width="24"
       height="24"

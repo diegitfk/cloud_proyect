@@ -1,5 +1,5 @@
-import { Card, CardHeader, CardContent } from "@/app/ui/card"
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from "@/app/ui/dropdown-menu"
+import { Card, CardHeader, CardContent } from "@/components/ui/card"
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 
 export default function CardElement() {
   return (
