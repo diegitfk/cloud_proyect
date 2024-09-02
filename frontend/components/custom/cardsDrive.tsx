@@ -33,7 +33,12 @@ const initialItems: DriveItem[] = [
   },
 ];
 
-export default function CardsDrive() {
+type CardsDriveProps = {
+  items: DriveItem[];
+  onAddItem: (item: DriveItem) => void;
+}
+
+export default function CardsDrive({ items, onAddItem }: CardsDriveProps) {
   const [items, setItems] = useState<DriveItem[]>(initialItems);
 
   const handleCreateFolder = () => {
@@ -57,11 +62,6 @@ export default function CardsDrive() {
     };
     setItems([...items, newFile]);
   };
-
-  type CardsDriveProps = {
-    items: DriveItem[];
-    onAddItem: (item: DriveItem) => void;
-  }
   return (
     <>
       {items.map((element: DriveItem) => (
