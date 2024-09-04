@@ -7,7 +7,7 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import FileIcon from "@/public/icons/fileicon.svg"
 import FolderIcon from "@/public/icons/foldericon.svg"
 
-// 
+// Este type maneja la estructura del Json que se enviará al BackEnd
 type DriveItem = {
     id: string; // ID del elemento
     name: string; // Nombre del elemento
@@ -39,7 +39,6 @@ type CardsDriveProps = {
 }
 
 export default function CardsDrive({ items, onAddItem }: CardsDriveProps) {
-  const [items, setItems] = useState<DriveItem[]>(initialItems);
 
   const handleCreateFolder = () => {
     const newFolder: DriveItem = {
