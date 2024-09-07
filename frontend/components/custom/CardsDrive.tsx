@@ -39,28 +39,6 @@ type CardsDriveProps = {
 }
 
 export default function CardsDrive({ items, onAddItem }: CardsDriveProps) {
-
-  const handleCreateFolder = () => {
-    const newFolder: DriveItem = {
-      id: (items.length + 1).toString(),
-      name: `Carpeta ${items.length + 1}`,
-      type: "folder",
-      createdAt: new Date().toLocaleDateString(),
-      icon: FolderIcon,
-    };
-    setItems([...items, newFolder]);
-  };
-
-  const handleCreateFile = () => {
-    const newFile: DriveItem = {
-      id: (items.length + 1).toString(),
-      name: `Archivo ${items.length + 1}`,
-      type: "file",
-      createdAt: new Date().toLocaleDateString(),
-      icon: FileIcon,
-    };
-    setItems([...items, newFile]);
-  };
   return (
     <>
       {items.map((element: DriveItem) => (

@@ -4,9 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import LogoCloudingDrive from "@/public/icons/cloudicon.svg";
-import SearchIcon from '@/public/icons/searchicon.svg';
-import LayoutGridIcon from '@/public/icons/layoutgridicon.svg';
-import BellIcon from '@/public/icons/bellicon.svg';
+import { SearchIcon, BellIcon } from 'lucide-react';
 
 export default function NavBar() {
   return (
@@ -19,10 +17,6 @@ export default function NavBar() {
         <Button variant="ghost" size="icon" className="rounded-full">
           <SearchIcon className="h-5 w-5" />
           <span className="sr-only">Buscar</span>
-        </Button>
-        <Button variant="ghost" size="icon" className="rounded-full">
-          <LayoutGridIcon className="h-5 w-5" />
-          <span className="sr-only">Apps</span>
         </Button>
         <Button variant="ghost" size="icon" className="rounded-full">
           <BellIcon className="h-5 w-5" />
@@ -42,7 +36,7 @@ export default function NavBar() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Sesión iniciada como</DropdownMenuLabel>
+            <DropdownMenuLabel>Sesión iniciada como </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Tu drive</DropdownMenuItem>
             <DropdownMenuItem>Compartido conmigo</DropdownMenuItem>
@@ -52,7 +46,7 @@ export default function NavBar() {
             <DropdownMenuItem>Configuraciones</DropdownMenuItem>
             <DropdownMenuItem>Ayuda</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Cerrar sesión</DropdownMenuItem>
+            <DropdownMenuItem className='text-red-500 hover:bg-red-500 hover:text-white'>Cerrar sesión</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </nav>
