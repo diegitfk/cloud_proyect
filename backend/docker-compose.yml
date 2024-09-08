@@ -17,7 +17,8 @@ services:
     ports:
       - "8070:8000"
     environment:
-      - MONGO_URL=mongodb://mongo_auth:27017
+      - MONGO_URL=mongodb://root:root123.@mongo_auth:27017
+    command: sh -c "python3 models/migrates_data_db.py && rm models/migrates_data_db.py && uvicorn app:app --reload --host 0.0.0.0 --port 8000 --reload"
     depends_on:
       - mongo_auth
 
@@ -27,7 +28,7 @@ services:
     ports:
       - "8090:8000"
     environment:
-      - MONGO_URL=mongodb://mongo_cloud:27017
+      - MONGO_URL=mongodb://root:root123.@mongo_cloud:27017
     depends_on:
       - mongo_cloud
 

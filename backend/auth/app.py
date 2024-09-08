@@ -1,48 +1,110 @@
-from fastapi import FastAPI, Form, UploadFile, Path, Query
-from dotenv import dotenv_values
-from passlib.context import CryptContext
+from fastapi import FastAPI , Depends, status, Form, Request
+from fastapi.responses import JSONResponse , Response
+from fastapi.exceptions import HTTPException
+from models.db import engine
+from beanie import init_beanie
+from beanie.operators import Or
+from models.models import UserSign, UserLogin, NewAccount
+from jwt import DecodeError , ExpiredSignatureError
+from utils.security import SecurityFlow , JwtFlow, TokenData, Token , _env_values
+from models.documents import User , Plan
 from typing import Annotated
-import jwt
-import zipfile
-import subprocess
-import pymongo
+from pydantic import EmailStr
+from datetime import timedelta
 
-"""
-    ### Finalidad de este archivo
-    Contiene todos los controladores y puntos finales de la api, para el login, 
-    este modulo es el cuerpo principal del servicio /account
-"""
-app = FastAPI()
-ctx = CryptContext(schemes=["sha256_crypt"])
-@app.post("/create_user")
-async def register_user() -> None:
-    """
-        #### Descripción de funcionalidad
-        Ruta a la cual llegarán las solicitudes cuando los nuevo clientes enviarán datos a la api
-        desde el frontend para registrarlos en la base de datos de la app
-        ##### La etapas para crear un usuario deberián ser las siguientes
-        1._ Registrar al usuario en la base de datos
-        2._ Registrar al usuario en el sistema operativo de la maquina 
-        este paso se divide en los siguientes sub pasos
-            - 
-    """
-    ...
+app = FastAPI(root_path="/auth")
+context_crypt = SecurityFlow("sha256_crypt")
+authorization_schema = JwtFlow()
+async def start_db():
+    db_session = init_beanie(engine["auth_db"] , document_models=[User , Plan])
+    try:
+        yield await db_session
+    finally:
+        db_session.close()
+#Webhook de comunicación con servicio de cloud
+@app.webhooks.post("register-event")
+async def send_register_event_to_cloud(event_new_account : NewAccount):
+    return "Hola Mundo"
+#Errores de validacion del token que finalizaran la sesion de la cookie
+@app.exception_handler(DecodeError)
+async def invalid_token_finish_session(req : Request , exc : DecodeError):
+    response = Response(content="This token is invalid" , status_code=status.HTTP_401_UNAUTHORIZED)
+    response.delete_cookie("session_jwt")
+    return response
+
+@app.exception_handler(ExpiredSignatureError)
+async def expire_token_finish_session(req : Request , exc : ExpiredSignatureError):
+    response = Response(content="Expire token" , status_code=status.HTTP_401_UNAUTHORIZED)
+    response.delete_cookie("session_jwt")
+    return response
+
+#Endpoint de Sign al sistema.
+@app.post("/sign")
+async def sign_on_sys(register_user_data : UserSign , start_session_db = Depends(start_db)):
+    #obtener un posible usuario con el email registrado
+    user_on_db_by_email_or_username = await User.find(Or(User.email == register_user_data.email , User.username == register_user_data.username)).first_or_none()
+    if user_on_db_by_email_or_username:
+        raise HTTPException({"reason" : "actually this email or username is register on system try with other username or email"} , status_code=status.HTTP_400_BAD_REQUEST)
+    hash_password = context_crypt.crypt_password(register_user_data.password)
+    plan_selected = await Plan.find_one(Plan.type == register_user_data.plan)
+    if not plan_selected:
+        raise HTTPException(detail={"reason" : "The plan selected is not valid"} , status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
+    new_user = User(
+        username=register_user_data.username,
+        nombre=register_user_data.nombre,
+        apellido=register_user_data.apellido,
+        email=register_user_data.email,
+        password=hash_password,
+        plan=plan_selected.id
+    )
+    await new_user.insert()
+    return JSONResponse(
+        content={
+            "success" : "success in sign" , 
+            "username" : new_user.username
+            } , 
+        status_code=status.HTTP_201_CREATED
+        )
+
+#Endpoint de Login al sistema
 @app.post("/login")
-async def login() -> None:
-    """
-        #### Descripción de funcionalidad
-        Ruta a la cual llegarán las solicitudes para hacer login a la app
-        esto con la finalidad de verificar el acceso y entregar tokens con tiempo 
-        de expiración   
-    """
+async def login_on_sys(user_login : UserLogin, start_session_db = Depends(start_db)) -> Token:
+    #Obtenemos el usuario por email
+    user_in_db = await User.find_one(User.email == user_login.email)
+    #Si no existe retornamos un error
+    if user_in_db is None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST , detail={"reason" : "This email is not valid, try with other" , "email" : user_login.email})
+    #Si no hace match el password enviado con el hash de la base de datos del usuario.
+    if not context_crypt.verify_hash(user_login.password , user_in_db.password):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST , detail={"reason" : "The password is not correct" , "password" : user_login.password})
+    payload_token = TokenData(username=user_in_db.username , name=user_in_db.nombre , last_name=user_in_db.apellido)
+    token = JwtFlow.generate_token(payload=payload_token , expire_token_on=timedelta(minutes=2))
+    response = JSONResponse(content={"message" : "Welcome to APP"})
+    response.set_cookie(
+        key="session_jwt" , 
+        value=token.access_token,
+        httponly=True
+        )
+    return response
+
+@app.get("/")
+async def get_priv_resouce(token : Annotated[TokenData , Depends(authorization_schema)]):
+    print(token)
+    return {"Hello" : "World"}
+#Ruta para solicitar restablecimiento de contraseña
+@app.post("/request_reset_password")
+async def request_reset_password_on_sys(email : EmailStr):
+    #Obtener el usuario por email
+    #Generar codigo de verificación
+    #Insertar el codigo de verificación y el tiempo de expiración de este en la colección usuarios
+    #Responder con el codigo de verificación del usuario.
+    ...
+@app.post("/reset_password")
+async def reset_password_on_sys(email : EmailStr , new_password : str , code: str):
+    #Obtener el usuario por email con su codigo de verificación
+    #Obtener el tiempo actual y compararlo con el tiempo de expiración
+    #Comparar el codigo enviado con el codigo de verificación generado para el usuario.
+    #Si coinciden retornar el exito en el cambio de la contraseña.
     ...
 
-@app.post("/create_dir/{name_dir}")
-async def creating_a_dir(name_dir : Annotated[str , Path(...)]) -> None:
-    result = subprocess.run(["mkdir" , f"{name_dir}"] , capture_output=True, text=True)
-    print(result.stdout , result.stderr)
-
-@app.post("/upload_files")
-async def received_files(files : UploadFile) -> None:
-    with zipfile.ZipFile(files.file , 'r') as zip_ref:
-        zip_ref.extractall("/test_extract")
+#Ruta donde se envia la contraseña y se verifica que el codigo generado no expiro
