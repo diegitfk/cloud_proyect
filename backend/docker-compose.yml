@@ -3,6 +3,7 @@ version: '3.8'
 services:
   nginx:
     image: nginx:latest
+    container_name: nginx
     ports:
       - "8000:8080"
     volumes:
@@ -10,6 +11,8 @@ services:
     depends_on:
       - auth
       - cloud
+    networks:
+      - service
 
   auth:
     image: auth_server
@@ -21,6 +24,8 @@ services:
     command: sh -c "python3 models/migrates_data_db.py && rm models/migrates_data_db.py && uvicorn app:app --reload --host 0.0.0.0 --port 8000 --reload"
     depends_on:
       - mongo_auth
+    networks:
+      - service
 
   cloud:
     image: cloud_server
@@ -31,6 +36,8 @@ services:
       - MONGO_URL=mongodb://root:root123.@mongo_cloud:27017
     depends_on:
       - mongo_cloud
+    networks:
+      - service
 
   mongo_auth:
     image: mongo:latest
@@ -42,6 +49,8 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=root123.
     volumes:
       - ./mongo_auth_p:/data/db
+    networks:
+      - service
 
   mongo_cloud:
     image: mongo:latest
@@ -53,6 +62,12 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=root123.
     volumes:
       - ./mongo_cloud_p:/data/db
+    networks:
+      - service
+
+networks:
+  service:
+    driver: bridge
 
 volumes:
   mongo_auth_p:

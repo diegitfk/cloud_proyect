@@ -17,4 +17,10 @@ class UserLogin(BaseModel):
 
 class NewAccount(BaseModel):
     username : str
+    plan_name : TypePlan
+    limit_memory : int
+    unity_memory : str
     name : str   
+class CredentialsTransaction(BaseModel):
+    id_transaction : str
+    api_key : str

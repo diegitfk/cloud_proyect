@@ -52,8 +52,8 @@ class Plan(Document):
     class Settings:
         name = "plans"
 
-async def main():
-    client = AsyncIOMotorClient("mongodb://localhost:27017")
+#async def main():
+    #client = AsyncIOMotorClient("mongodb://localhost:27017")
     #engine_db = await init_beanie(client["auth_db"] , document_models=[User , Plan])
     #plan_basic = Plan(type="basic" , unity_memory="MB" , limit_memory=100)
     #await plan_basic.insert()

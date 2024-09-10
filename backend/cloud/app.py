@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Form, UploadFile, Path, Query , Request , status , Response ,Depends
+from routers.webhooks import webhook_router
 from dotenv import dotenv_values
-from passlib.context import CryptContext
 from jwt import DecodeError , ExpiredSignatureError
 from utils.security import JwtFlow , TokenData
 from typing import Annotated
@@ -12,8 +12,9 @@ import subprocess
     Contiene todos los controladores y puntos finales de la api, para el login, 
     este modulo es el cuerpo principal del servicio /account
 """
-app = FastAPI(root_path="/cloud")
 auth_schema = JwtFlow()
+app = FastAPI(root_path="/cloud")
+app.include_router(webhook_router)
 #Errores de validacion del token que finalizaran la sesion de la cookie
 @app.exception_handler(DecodeError)
 async def invalid_token_finish_session(req : Request , exc : DecodeError):
@@ -33,6 +34,6 @@ async def creating_a_dir(name_dir : Annotated[str , Path(...)] , token : Annotat
     print(result.stdout , result.stderr)
 
 @app.post("/upload_files")
-async def received_files(files : UploadFile , token : Annotated[TokenData , Depends(auth_schema)] ) -> None:
+async def received_files(files : UploadFile , token : Annotated[TokenData , Depends(auth_schema)]) -> None:
     with zipfile.ZipFile(files.file , 'r') as zip_ref:
         zip_ref.extractall("/test_extract")

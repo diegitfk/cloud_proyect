@@ -8,13 +8,13 @@ from datetime import timezone , datetime , timedelta
 from pydantic import BaseModel, Field, HttpUrl
 from dotenv import dotenv_values
 import jwt
-from fastapi.security import OAuth2PasswordBearer
-
+import httpx
 class Env(BaseModel):
     EMPLOYEE_SECRET_KEY : str
     ALGORITHM_JWT : str 
     EXPIRE_TOKEN_MINUTES : int
-    WEBHOOK_URL : HttpUrl
+    WEBHOOK_START_TRANSACTION : str
+    WEBHOOK_NEW_ACCOUNT_URL : str
 
 class TokenData(BaseModel):
     """
@@ -42,6 +42,7 @@ class SecurityFlow:
         return self.context.verify(plain_password , hash_password)
 
 _env_values : Env = Env(**dotenv_values("./.env"))
+
 class JwtFlow:
     @staticmethod
     def generate_token(payload : TokenData , expire_token_on : Optional[timedelta] = None) -> Token:

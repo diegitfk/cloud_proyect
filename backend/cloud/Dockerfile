@@ -6,4 +6,5 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . /cloud_proyect/backend/cloud
 EXPOSE 8000
+RUN mkdir /cloud_root
 CMD [ "uvicorn" , "app:app" , "--reload" , "--host" , "0.0.0.0" , "--port" , "8000" ]

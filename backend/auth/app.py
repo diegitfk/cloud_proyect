@@ -4,13 +4,14 @@ from fastapi.exceptions import HTTPException
 from models.db import engine
 from beanie import init_beanie
 from beanie.operators import Or
-from models.models import UserSign, UserLogin, NewAccount
+from models.models import UserSign, UserLogin, NewAccount, CredentialsTransaction
 from jwt import DecodeError , ExpiredSignatureError
 from utils.security import SecurityFlow , JwtFlow, TokenData, Token , _env_values
 from models.documents import User , Plan
-from typing import Annotated
+from typing import Annotated, Any
 from pydantic import EmailStr
 from datetime import timedelta
+import httpx
 
 app = FastAPI(root_path="/auth")
 context_crypt = SecurityFlow("sha256_crypt")
@@ -21,10 +22,28 @@ async def start_db():
         yield await db_session
     finally:
         db_session.close()
+        
 #Webhook de comunicación con servicio de cloud
-@app.webhooks.post("register-event")
+@app.webhooks.post("new-account")
 async def send_register_event_to_cloud(event_new_account : NewAccount):
-    return "Hola Mundo"
+    async with httpx.AsyncClient() as client:
+        response_generate_api_key = await client.get(url=_env_values.WEBHOOK_START_TRANSACTION)
+        if response_generate_api_key.status_code != 200: #En caso de que cloud_server no responda correctamente al obtener credenciales de transaccion.
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT , detail={"reason" : "No created credentials"})
+        credentials_response = response_generate_api_key.json()
+        credentials = CredentialsTransaction(**credentials_response)
+        transaction_new_event = await client.post(
+            url=_env_values.WEBHOOK_NEW_ACCOUNT_URL , 
+            json=event_new_account.model_dump(exclude_none=True),
+            headers={
+                "X-Signature" : credentials.api_key,
+                "X-Transaction" : credentials.id_transaction
+            })
+        if transaction_new_event.status_code != 201: #En caso de que cloud_server no responda correctamente al configurar las carpetas en el sistema
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST , detail={"reason" : "Error on configuration dir"})
+        transaction_response_json : dict[str , Any] = transaction_new_event.json()
+    return transaction_response_json
+
 #Errores de validacion del token que finalizaran la sesion de la cookie
 @app.exception_handler(DecodeError)
 async def invalid_token_finish_session(req : Request , exc : DecodeError):
@@ -57,7 +76,17 @@ async def sign_on_sys(register_user_data : UserSign , start_session_db = Depends
         password=hash_password,
         plan=plan_selected.id
     )
-    await new_user.insert()
+    res = await send_register_event_to_cloud(
+        NewAccount(
+            username=new_user.username , 
+            plan_name=plan_selected.type , 
+            limit_memory=plan_selected.limit_memory , 
+            unity_memory=plan_selected.unity_memory , 
+            name=new_user.nombre
+            )
+        )
+    if res:
+        await new_user.insert()
     return JSONResponse(
         content={
             "success" : "success in sign" , 

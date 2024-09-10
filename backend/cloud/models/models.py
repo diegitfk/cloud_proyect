@@ -1,5 +1,5 @@
 from enum import StrEnum
-from typing import List
+from typing import List, Optional, Literal
 from pydantic import BaseModel , Field
 import os
 import time
@@ -36,3 +36,15 @@ class StructureCurrentPath(BaseModel):
                 self.current_items.append(ItemFileSystem(name=name , type=ItemType.DIRECTORY , created_at=created_at , size=size))
             else:
                 self.current_items.append(ItemFileSystem(name=name , type=ItemType.FILE , created_at=created_at , size=size))  
+
+class NewAccount(BaseModel):
+    username : str
+    plan_name : Literal['basic' , 'medium' , 'pro']
+    limit_memory : int
+    unity_memory : str
+    name : str  
+    
+class EventCredentials(BaseModel):
+    id : str
+    api_key : str
+    host : str

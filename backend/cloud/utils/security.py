@@ -14,6 +14,7 @@ class Env(BaseModel):
     EMPLOYEE_SECRET_KEY : str
     ALGORITHM_JWT : str 
     EXPIRE_TOKEN_MINUTES : int
+    ROOT_CLOUD_PATH : str
 
 class TokenData(BaseModel):
     """
