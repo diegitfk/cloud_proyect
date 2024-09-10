@@ -30,7 +30,7 @@ async def expire_token_finish_session(req : Request , exc : ExpiredSignatureErro
 
 @app.post("/create_dir/{name_dir}")
 async def creating_a_dir(name_dir : Annotated[str , Path(...)] , token : Annotated[TokenData , Depends(auth_schema)]) -> None:
-    result = subprocess.run(["mkdir" , f"{name_dir}"] , capture_output=True, text=True)
+    
     print(result.stdout , result.stderr)
 
 @app.post("/upload_files")

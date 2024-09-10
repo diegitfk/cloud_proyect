@@ -19,14 +19,14 @@ class User(Document):
         name="users"
 
 class Folder(Document):
-    folder_name : Annotated[UUID4 , Field(default=uuid4) , Indexed(unique=True)]
+    folder_name : Annotated[UUID4 , Field(default_factory=uuid4) , Indexed(unique=True)]
     limit_capacity : int
     current_capacity : int
     unity_memory : Literal["MB" , "GB"]
     plan_name : Literal["basic" , "medium" , "pro"]
     owner : BackLink[User] = Field(original_field="folder")
     created_at : Annotated[datetime , Field(default_factory=datetime.now)]
-    updated_at : Optional[datetime]
+    updated_at : Optional[datetime] = Field(default=None)
 
     @before_event(Update)
     def updated_at_up(self):

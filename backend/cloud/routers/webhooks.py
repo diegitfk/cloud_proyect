@@ -4,12 +4,14 @@ from fastapi.exceptions import HTTPException
 from fastapi.responses import JSONResponse
 from models.documents import User , Folder
 from models.db import engine
+from utils.security import _env_values
 from beanie import init_beanie
 from models.models import NewAccount, EventCredentials
 from typing import Annotated
 from datetime import timedelta, datetime, timezone
 from secrets import token_hex
 from uuid import uuid4
+import asyncio
 
 webhook_router = APIRouter(prefix="/webhooks")
 auth_transaction_for = dict()
@@ -52,8 +54,31 @@ async def key_for_emisor(request : Request):
 
 @webhook_router.post("/configure_dir_account")
 async def config_new_account(new_account : NewAccount , transaction_credentials : Annotated[EventCredentials , Depends(verify_credentials_transaction)] , session_db = Depends(start_session_db)):
-    print(new_account)
+    #Validamos que ese usuario ya no se encuentre registrado
+    #Registramos una instancia de la carpeta root y del usuario sin guardar en bd
+    new_root_folder = Folder(
+        limit_capacity=new_account.limit_memory , 
+        current_capacity=0 , 
+        unity_memory=new_account.unity_memory, 
+        plan_name=new_account.plan_name
+        )
+    new_user = User(
+        username=new_account.username , 
+        nombre=new_account.name,
+        folder=new_root_folder
+        )
     #Creamos la carpeta en el sistema
-    #Insertamos metadatos de la carpeta mediante Folders
+    #Todo: Se debe limitar el espacio de la carpeta creada acorde a el plan seleccionado por el usuario
+    proc = await asyncio.create_subprocess_shell(
+        cmd=f"mkdir {_env_values.ROOT_CLOUD_PATH}/{str(new_root_folder.folder_name)}",
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE
+    )
+    stdout , stderr = await proc.communicate()
+    if stderr:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT , detail={"reason" : "err on create dir"})
+    #Si no hay error en la carpeta raiz configurada guardamos el usuario y el folder en la base de datos.
+    await new_root_folder.save()
+    await new_user.save()
     return JSONResponse(content={"operation" : "success"}, status_code=status.HTTP_201_CREATED)
 
