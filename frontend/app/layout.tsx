@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "../styles/globals.css";
+import { cn } from '@/lib/utils'
 
-const inter = Inter({ subsets: ["latin"] });
+const fontBody = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-body',
+})
 
 export const metadata: Metadata = {
   title: "CloudingDrive",
@@ -16,7 +21,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={cn(
+          'antialiased',
+          fontBody.variable
+        )}>
         {children}
       </body>
     </html>

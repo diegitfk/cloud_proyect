@@ -3,12 +3,22 @@ import { Button } from "../ui/button"
 import { PlusIcon, TrashIcon, FolderIcon, HomeIcon } from "lucide-react"
 import DrawerElement from "./DrawerElement"
 
-export default function SideBar() {
+type SideBarProps = {
+  newFolderName: string;
+  setNewFolderName: (name: string) => void;
+  handleCreateFolder: () => void;
+};
+
+export default function SideBar({newFolderName, setNewFolderName, handleCreateFolder}: SideBarProps) {  
   return (
     <div className="hidden w-64 flex-col border-r bg-background p-4 md:flex">
-      {/* Botón Nuevo que activa el Drawer */}
-      <DrawerElement>
-        <Button variant="outline" className="mb-4">
+      {/* Botón Nuevo que activa el Drawer de Escritorio */}
+      <DrawerElement 
+        newFolderName={newFolderName}
+        setNewFolderName={setNewFolderName}
+        handleCreateFolder={handleCreateFolder}
+      >
+        <Button variant="outline" className="mb-4 hover:bg-[#59B47D] hover:text-white">
           <PlusIcon className="mr-2 h-4 w-4" />
           Nuevo
         </Button>

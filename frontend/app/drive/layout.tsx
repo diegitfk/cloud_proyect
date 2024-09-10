@@ -1,7 +1,5 @@
 import NavBar from "@/components/custom/NavBar"
 import PageDrive from "./page";
-import SideBar from "@/components/custom/SideBar";
-import BreadCrum from "@/components/custom/BreadCrum";
 
 export default function LayoutDrive() {
   return (
@@ -10,14 +8,9 @@ export default function LayoutDrive() {
         <NavBar />
       </header>
       <div className="flex flex-1">
-        <SideBar />
-        <div className="flex flex-col flex-1">
-            {/* Componente de navegación */}
-            <BreadCrum />
-          <div className="flex-1">
-            {/* Contenido de la página drive  -- Manejar el cambio de vista */}
-            <PageDrive />
-          </div>
+        <div className="flex-1">
+          {/* Contenido de la página drive  -- Manejar el cambio de vista */}
+          <PageDrive />
         </div>
       </div>
     </>
