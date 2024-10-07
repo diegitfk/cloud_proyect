@@ -15,7 +15,9 @@ services:
       - service
 
   auth:
-    image: auth_server
+    build: 
+      context: ./auth
+      dockerfile: Dockerfile
     container_name: auth
     ports:
       - "8070:8000"
@@ -28,7 +30,9 @@ services:
       - service
 
   cloud:
-    image: cloud_server
+    build:
+      context: ./cloud
+      dockerfile: Dockerfile
     container_name: cloud
     ports:
       - "8090:8000"
