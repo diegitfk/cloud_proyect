@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     });
 
     const data = await response.json();
-    console.log('Response from FastAPI:', data);
+    console.log('Respuesta recibida de FASTAPI:', data);
 
     if (response.ok) {
       return NextResponse.json(data, { status: 201 });

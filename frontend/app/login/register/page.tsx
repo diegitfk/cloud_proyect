@@ -81,12 +81,12 @@ export default function PageRegister() {
   }
   return (
     <div className="flex-col place-content-center min-h-screen">
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-center animate-fade-down animate-once animate-duration-200 animate-delay-100 animate-ease-out animate-normal animate-fill-backwards">
           <LogoCloudingDrive width={70} height={70}/>
           <h1 className="xl:text-6xl md:text-2xl font-bold ml-4">CloudingDrive</h1>
       </div>
       <Card className="mx-auto w-full max-w-2xl shadow-lg p-2 mt-10">
-        <CardHeader>
+        <CardHeader className="animate-fade animate-duration-100 animate-delay-200 animate-ease-out animate-fill-backwards">
           <CardTitle className="text-2xl mx-auto">Creación de cuenta</CardTitle>
           <CardDescription className="text-muted-foreground">
             Ingrese sus datos a continuación para registrarse en nuestra plataforma.
@@ -99,7 +99,7 @@ export default function PageRegister() {
                 control={form.control}
                 name="username"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="animate-fade-left animate-duration-100 animate-delay-[100ms] animate-ease-out animate-fill-backwards">
                     <FormLabel>Username</FormLabel>
                     <FormControl>
                       <Input placeholder="John47" {...field} />
@@ -112,7 +112,7 @@ export default function PageRegister() {
                 control={form.control}
                 name="nombre"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="animate-fade-left animate-duration-100 animate-delay-[200ms] animate-ease-out animate-fill-backwards">
                     <FormLabel>Nombre</FormLabel>
                     <FormControl>
                       <Input placeholder="John" {...field} />
@@ -125,7 +125,7 @@ export default function PageRegister() {
                 control={form.control}
                 name="apellido"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="animate-fade-left animate-duration-100 animate-delay-[300ms] animate-ease-out animate-fill-backwards">
                     <FormLabel>Apellido</FormLabel>
                     <FormControl>
                       <Input placeholder="Doe" {...field} />
@@ -138,7 +138,7 @@ export default function PageRegister() {
                 control={form.control}
                 name="email"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="animate-fade-left animate-duration-100 animate-delay-[400ms] animate-ease-out animate-fill-backwards">
                     <FormLabel>Correo Electrónico</FormLabel>
                     <FormControl>
                       <Input type="email" placeholder="example@email.com" {...field} />
@@ -151,7 +151,7 @@ export default function PageRegister() {
                 control={form.control}
                 name="password"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="animate-fade-left animate-duration-100 animate-delay-[500ms] animate-ease-out animate-fill-backwards">
                     <FormLabel>Contraseña</FormLabel>
                     <div className="relative">
                       <Input
@@ -178,7 +178,7 @@ export default function PageRegister() {
                 control={form.control}
                 name="plan"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="animate-fade-left animate-duration-100 animate-delay-[600ms] animate-ease-out animate-fill-backwards">
                     <FormLabel>Plan de Suscripción</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
@@ -197,7 +197,7 @@ export default function PageRegister() {
                 )}
               />
             </CardContent>
-            <CardFooter className="flex-col">
+            <CardFooter className="flex-col animate-fade-up animate-once animate-duration-300 animate-delay-[700ms] animate-ease-in-out animate-normal animate-fill-backwards">
               <Button
                 className="w-full hover:bg-green-600 hover:text-white"
                 type="submit"
