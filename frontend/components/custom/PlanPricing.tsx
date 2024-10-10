@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button"
 import { CircleCheckBig } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 
 interface PlanPricing {
   id: number,
@@ -11,6 +12,7 @@ interface PlanPricing {
   features: string[];
   image: string;
   button: string;
+  style: string;
 }
 
 const PlanPricing = () => {
@@ -23,6 +25,7 @@ const PlanPricing = () => {
       features: ["5 GB Almacenamiento", "Banda ancha ilimitada", "1 usuario"],
       image: '/images/basic.webp',
       button: 'Suscríbete a Basic',
+      style: 'bg-card rounded-lg overflow-hidden shadow-lg max-w-[400px] md:w-full mx-auto'
     },
     {
       id: 2,
@@ -32,6 +35,7 @@ const PlanPricing = () => {
       features: ["20 GB Almacenamiento", "Banda ancha ilimitada", "5 usuarios"],
       image: '/images/medium.webp',
       button: 'Suscríbete a Medium',
+      style: 'bg-card rounded-lg overflow-hidden shadow-lg max-w-[400px] md:w-full mx-auto border-2 border-purple-500'
     },
     {
       id: 3,
@@ -41,14 +45,15 @@ const PlanPricing = () => {
       features: ["50 GB Almacenamiento", "Banda ancha ilimitada", "10 usuarios"],
       image: '/images/enterprise.webp',
       button: 'Suscríbete a Pro',
+      style: 'bg-card rounded-lg overflow-hidden shadow-lg max-w-[400px] md:w-full mx-auto'
     },
   ]
   return (
     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
       {plans.map((plan, index) => (
-        <div key={index} className="bg-card rounded-lg overflow-hidden shadow-lg max-w-[400px] md:w-full">
+        <div key={index} className={plan.style}>
           <div className="relative overflow-hidden h-[200px] md:h-[300px] group">
-            <img
+            <Image
               src={plan.image}
               alt={`${plan.name} Plan Image`}
               width={660}
