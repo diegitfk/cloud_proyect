@@ -19,7 +19,7 @@ export default function PageHome() {
                 </p>
               </div>
             </div>
-            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 min-h-screen">
+            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
               <Card className="animate-fade-up animate-once animate-duration-200 animate-delay-100 animate-ease-out animate-normal animate-fill-backwards">
                 <CardContent className="flex flex-col items-center justify-center gap-4 p-8">
                   <RocketIcon className="h-12 w-12 text-primary" />

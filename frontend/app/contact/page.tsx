@@ -33,33 +33,33 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit }) => {
         backgroundPosition: 'center'
       }}>
         <div className="container px-4 mx-auto h-full">
-          <div className='container text-center mx-auto py-10 text-white'>
+          <div className='container text-center mx-auto py-10 text-whit animate-fade-down animate-once animate-duration-200 animate-delay-200 animate-ease-out animate-alternate animate-fill-backwards'>
             <h2 className='font-semibold text-3xl'>Atención al cliente</h2>
             <h1 className='font-bold tracking-widest text-5xl py-2'>¿Necesitas ayuda?</h1>
             <p className='text-lg font-normal max-w-3xl mx-auto'>En CloudingDrive estamos para escuchar tus sugerencias, reclamos y contribuciones con la finalidad de mejorar nuestros servicios.</p>
           </div>
           <div className=" mx-auto p-3 content-center">
-            <div className=" max-w-md mx-auto p-8 bg-gray-100 rounded-lg shadow-lg">
-              <h2 className="text-2xl font-semibold text-gray-800 mb-4">Contacte con nosotros</h2>
+            <div className=" max-w-md mx-auto p-8 bg-secondary rounded-lg shadow-lg">
+              <h2 className="text-2xl font-semibold text-gray-100 mb-4 animate-fade-left animate-once animate-duration-200 animate-delay-250 animate-ease-out animate-normal animate-fill-backwards">Contacte con nosotros</h2>
               <form onSubmit={handleSubmit}>
-                <div className="mb-4">
-                  <Label className="block text-gray-800 mb-2" htmlFor="name">
+                <div className="mb-4 animate-fade-left animate-once animate-duration-[80ms] animate-delay-200 animate-ease-out animate-normal animate-fill-backwards">
+                  <Label className="block mb-2" htmlFor="name">
                     Ingrese su nombre
                   </Label>
                   <Input
-                    className="w-full px-4 py-2 bg-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300 transition duration-300"
+                    className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300 transition duration-300"
                     placeholder="John Doe"
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
                 </div>
-                <div className="mb-4">
-                  <Label className="block text-gray-800 mb-2" htmlFor="email">
+                <div className="mb-4 animate-fade-left animate-once animate-duration-[80ms] animate-delay-[400ms] animate-ease-out animate-normal animate-fill-backwards">
+                  <Label className="block mb-2" htmlFor="email">
                     Ingrese su email
                   </Label>
                   <Input
-                    className="w-full px-4 py-2 bg-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300 transition duration-300"
+                    className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300 transition duration-300"
                     placeholder="Ejemplo: correo@gmail.com"
                     name="email"
                     id="email"
@@ -68,12 +68,12 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit }) => {
                     onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
-                <div className="mb-4">
-                  <Label className="block text-gray-800 mb-2" htmlFor="message">
+                <div className="mb-4 animate-fade-left animate-once animate-duration-[80ms] animate-delay-[600ms] animate-ease-out animate-normal animate-fill-backwards">
+                  <Label className="block mb-2" htmlFor="message">
                     Escriba su mensaje
                   </Label>
                   <Textarea
-                    className="w-full px-4 py-2 bg-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300 transition duration-300"
+                    className="w-full px-4 py-2  rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300 transition duration-300"
                     rows={4}
                     placeholder="Me gustaría conocer más acerca de los servicios que presta CloudingDrive"
                     name="message"
@@ -82,8 +82,8 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit }) => {
                     onChange={(e) => setMessage(e.target.value)}
                   ></Textarea>
                 </div>
-                <div className='flex content-center'>
-                  <Button type='submit' className="mx-auto group relative inline-flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-neutral-950 font-medium text-neutral-200 transition-all duration-300 hover:w-32">
+                <div className='flex content-center animate-fade-up animate-once animate-duration-100 animate-delay-[800ms] animate-ease-out animate-alternate animate-fill-backwards'>
+                  <Button type='submit' className="mx-auto group relative inline-flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-neutral-950 font-medium text-neutral-200 transition-all duration-300 hover:w-32 hover:bg-blue-600">
                     <div className="inline-flex whitespace-nowrap opacity-0 transition-all duration-200 group-hover:-translate-x-3 group-hover:opacity-100">
                       Enviar
                     </div>
