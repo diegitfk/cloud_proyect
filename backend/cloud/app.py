@@ -1,12 +1,14 @@
 from fastapi import FastAPI, Form, UploadFile, Path, Query , Request , status , Response ,Depends
-from routers.webhooks import webhook_router
+from routers.webhooks import webhook_router, start_session_db
 from dotenv import dotenv_values
+from utils.sys_management import SysManagement
+from models.documents import User , Folder
 from jwt import DecodeError , ExpiredSignatureError
 from utils.security import JwtFlow , TokenData
-from typing import Annotated
+from typing import Annotated, Optional
 import jwt
 import zipfile
-import subprocess
+
 """
     ### Finalidad de este archivo
     Contiene todos los controladores y puntos finales de la api, para el login, 
@@ -28,12 +30,31 @@ async def expire_token_finish_session(req : Request , exc : ExpiredSignatureErro
     response.delete_cookie("session_jwt")
     return response
 
+@app.post("/rename_dir/{new_name_dir}")
+async def rename_dir(
+        new_name_dir : Annotated[str , Path(...)] , 
+        token : Annotated[TokenData , Depends(auth_schema)] , 
+        deep_path : Annotated[Optional[str] , Query(...)] = None , 
+        session_db = Depends(start_session_db)
+    ) -> None:
+
+    user = await User.find_one( User.username == token.username, fetch_links=True)
+    sys_manager = SysManagement()
+    await sys_manager.rename_file_or_folder(folder=user.folder , new_name=new_name_dir , path_folder=deep_path)
+
 @app.post("/create_dir/{name_dir}")
-async def creating_a_dir(name_dir : Annotated[str , Path(...)] , token : Annotated[TokenData , Depends(auth_schema)]) -> None:
+async def creating_a_dir(
+        name_dir : Annotated[str , Path(...)] , 
+        token : Annotated[TokenData , Depends(auth_schema)] , 
+        deep_path : Annotated[Optional[str] , Query(...)] = None , 
+        session_db = Depends(start_session_db)
+    ) -> None:
     
-    print(result.stdout , result.stderr)
+    user = await User.find_one( User.username == token.username, fetch_links=True)
+    sys_manager = SysManagement()
+    await sys_manager.create_dir(folder=user.folder , name_dir=name_dir , path_folder=deep_path)
 
 @app.post("/upload_files")
-async def received_files(files : UploadFile , token : Annotated[TokenData , Depends(auth_schema)]) -> None:
+async def received_files(files : list[UploadFile]) -> None:
     with zipfile.ZipFile(files.file , 'r') as zip_ref:
         zip_ref.extractall("/test_extract")
