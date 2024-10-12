@@ -62,14 +62,14 @@ export default function PageLogin() {
   return (
     <>
       <div className="flex items-center justify-center min-h-screen">
-        <Card className="w-full max-w-md shadow-lg py-5">
-          <CardHeader>
+        <Card className="w-full max-w-md shadow-lg py-5 animate-fade animate-once animate-duration-[600ms] animate-delay-[40ms] animate-ease-out animate-normal animate-fill-backwards">
+          <CardHeader className='animate-fade-down animate-once animate-duration-[200ms] animate-delay-[100ms] animate-ease-out animate-normal animate-fill-backwards'>
             <CardTitle className="text-2xl mx-auto">Iniciar Sesión</CardTitle>
             <CardDescription>Ingrese su correo electrónico y contraseña.</CardDescription>
           </CardHeader>
           <form onSubmit={handleLogin}>
             <CardContent className="space-y-4">
-              <div className="grid gap-2">
+              <div className="grid gap-2 animate-fade-left animate-once animate-duration-[80ms] animate-delay-[200ms] animate-ease-out animate-normal animate-fill-backwards">
                 <Label htmlFor="email">Correo Electrónico</Label>
                 <Input
                   required
@@ -80,7 +80,7 @@ export default function PageLogin() {
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
-              <div className="grid gap-2">
+              <div className="grid gap-2 animate-fade-left animate-once animate-duration-[80ms] animate-delay-[400ms] animate-ease-out animate-normal animate-fill-backwards">
                 <Label htmlFor="password">Contraseña</Label>
                 <Input
                   required
@@ -90,13 +90,13 @@ export default function PageLogin() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-                <Link href="#" className="ml-auto inline-block text-sm underline " prefetch={false}>
+                <Link href="#" className="ml-auto inline-block text-sm underline animate-fade-left animate-once animate-duration-[80ms] animate-delay-[600ms] animate-ease-out animate-normal animate-fill-backwards " prefetch={false}>
                   ¿Olvidaste tu contraseña?
                 </Link>
               </div>
               {error && <p className="text-red-500 text-sm">{error}</p>}
             </CardContent>
-            <CardFooter className='flex-col'>
+            <CardFooter className='flex-col animate-fade-up animate-once animate-duration-[100ms] animate-delay-[800ms] animate-ease-out animate-normal animate-fill-backwards'>
               <Button
                 className="w-full hover:bg-green-600 hover:text-white"
                 type='submit'
