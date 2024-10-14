@@ -20,7 +20,8 @@ class NewAccount(BaseModel):
     plan_name : TypePlan
     limit_memory : int
     unity_memory : str
-    name : str   
+    name : str 
+      
 class CredentialsTransaction(BaseModel):
     id_transaction : str
     api_key : str
