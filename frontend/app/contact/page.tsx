@@ -27,7 +27,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit }) => {
   return (
     <>
       <NavBarLayout />
-      <main className='h-full' style={{
+      <main className='min-h-screen' style={{
         backgroundImage: 'url(/images/background_contact.svg)',
         backgroundSize: 'cover',
         backgroundPosition: 'center'
