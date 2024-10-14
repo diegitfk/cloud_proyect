@@ -53,6 +53,18 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      filepond:
+        specifier: ^4.31.4
+        version: 4.31.4
+      filepond-plugin-file-validate-type:
+        specifier: ^1.2.9
+        version: 1.2.9(filepond@4.31.4)
+      filepond-plugin-image-exif-orientation:
+        specifier: ^1.0.11
+        version: 1.0.11(filepond@4.31.4)
+      filepond-plugin-image-preview:
+        specifier: ^4.6.12
+        version: 4.6.12(filepond@4.31.4)
       lucide-react:
         specifier: ^0.428.0
         version: 0.428.0(react@18.3.1)
@@ -65,6 +77,9 @@ importers:
       react-dom:
         specifier: ^18
         version: 18.3.1(react@18.3.1)
+      react-filepond:
+        specifier: ^7.1.2
+        version: 7.1.2(filepond@4.31.4)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-hook-form:
         specifier: ^7.53.0
         version: 7.53.0(react@18.3.1)
@@ -2120,6 +2135,24 @@ packages:
     resolution: {integrity: sha512-7Gps/XWymbLk2QLYK4NzpMOrYjMhdIxXuIvy2QBsLE6ljuodKvdkWs/cpyJJ3CVIVpH0Oi1Hvg1ovbMzLdFBBg==}
     engines: {node: ^10.12.0 || >=12.0.0}
 
+  filepond-plugin-file-validate-type@1.2.9:
+    resolution: {integrity: sha512-Tzv07aNdZvjUXDRA3XL16QMEvh6llDrXlcZ6W0eTHQ+taHaVg/JKJTFs/AViO+6ZcpPCcQStbhYEL2HoS+vldw==}
+    peerDependencies:
+      filepond: '>=1.x <5.x'
+
+  filepond-plugin-image-exif-orientation@1.0.11:
+    resolution: {integrity: sha512-hLBc12Fk6Zkj3L8mSAn+elugHOqT5rLUbgVXQQIQjMe0FsGjtpoxqeVR6jt4IWHGat2L9sFAgU2TGmd1mqosCg==}
+    peerDependencies:
+      filepond: '>=3.x <5.x'
+
+  filepond-plugin-image-preview@4.6.12:
+    resolution: {integrity: sha512-Y8ETX5QVV0mbPB0586UH8AUmG9tZg8PuN5bdEAIlZVJFTct5ebViJ7+Am94/VhTPjLqZjBf1zmDq5JU6XRsZKw==}
+    peerDependencies:
+      filepond: '>=4.x <5.x'
+
+  filepond@4.31.4:
+    resolution: {integrity: sha512-3kR87Rsw2OP8CktlIehdbFjWB33GEH5iLs8izl2OcZGOszUFWYTjRY6pffLpjz/gRE61u1F67rZ2++ujFiUxPQ==}
+
   fill-range@7.1.1:
     resolution: {integrity: sha512-YsGpe3WHLK8ZYi4tWDg2Jy3ebRz2rXowDxnld4bkQB00cc/1Zw9AWnC0i9ztDJitivtQvaI9KaLyKrc+hBW0yg==}
     engines: {node: '>=8'}
@@ -2786,6 +2819,13 @@ packages:
     resolution: {integrity: sha512-5m4nQKp+rZRb09LNH59GM4BxTh9251/ylbKIbpe7TpGxfJ+9kv6BLkLBXIjjspbgbnIBNqlI23tRnTWT0snUIw==}
     peerDependencies:
       react: ^18.3.1
+
+  react-filepond@7.1.2:
+    resolution: {integrity: sha512-vrlx9o/n+jGikh6jLey+PpUGYtEZn8MdeB6JFeX/5/N/Mu75IHG+MFQbv8R27bNXvS41mDtV9Fo5DG+s6siVIA==}
+    peerDependencies:
+      filepond: '>=3.7.x < 5.x'
+      react: 16 - 18
+      react-dom: 16 - 18
 
   react-hook-form@7.53.0:
     resolution: {integrity: sha512-M1n3HhqCww6S2hxLxciEXy2oISPnAzxY7gvwVPrtlczTM/1dDadXgUxDpHMrMTblDOcm/AXtXxHwZ3jpg1mqKQ==}
@@ -5733,6 +5773,20 @@ snapshots:
     dependencies:
       flat-cache: 3.2.0
 
+  filepond-plugin-file-validate-type@1.2.9(filepond@4.31.4):
+    dependencies:
+      filepond: 4.31.4
+
+  filepond-plugin-image-exif-orientation@1.0.11(filepond@4.31.4):
+    dependencies:
+      filepond: 4.31.4
+
+  filepond-plugin-image-preview@4.6.12(filepond@4.31.4):
+    dependencies:
+      filepond: 4.31.4
+
+  filepond@4.31.4: {}
+
   fill-range@7.1.1:
     dependencies:
       to-regex-range: 5.0.1
@@ -6375,6 +6429,12 @@ snapshots:
       loose-envify: 1.4.0
       react: 18.3.1
       scheduler: 0.23.2
+
+  react-filepond@7.1.2(filepond@4.31.4)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      filepond: 4.31.4
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
 
   react-hook-form@7.53.0(react@18.3.1):
     dependencies:
