@@ -11,7 +11,7 @@ type SideBarProps = {
 
 export default function SideBar({newFolderName, setNewFolderName, handleCreateFolder}: SideBarProps) {  
   return (
-    <div className="hidden w-64 flex-col border-r bg-background p-4 md:flex">
+    <div className="w-64 h-full flex-shrink-0 flex-col border-r bg-background p-4 md:flex overflow-y-auto" aria-label="Menú lateral">
       {/* Botón Nuevo que activa el Drawer de Escritorio */}
       <DrawerElement 
         newFolderName={newFolderName}

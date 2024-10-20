@@ -25,14 +25,14 @@ const CardsDrive: React.FC<CardsDriveProps> = ({ items, onAddItem }) => {
   return (
     <>
       {items.map((element: DriveItem) => (
-        <Card key={element.id} className="group shadow-md">
+        <Card key={element.id} className="group shadow-md max-w-[260px] cursor-pointer transition-transform duration-200 ease-in-out transform active:scale-95 hover:scale-105">
           <CardHeader className="flex flex-row-reverse items-center justify-center p-2">
             <div className='flex justify-end'>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full">
+                  <Button variant="ghost" size="icon" className="rounded-full select-none">
                     <Image src='icons/movehorizontal.svg' alt='imagen' width={24} height={24} />
-                    <span className="sr-only">Más opciones</span>
+                    <span className="select-none sr-only">Más opciones</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -45,7 +45,7 @@ const CardsDrive: React.FC<CardsDriveProps> = ({ items, onAddItem }) => {
               </DropdownMenu>
             </div>
             <div className="flex items-center justify-center gap-2 grow">
-              <div className="flex flex-row p-2 text-sm font-medium">{element.name}</div>
+              <div className="flex flex-row p-2 text-sm font-medium select-none">{element.name}</div>
             </div>
           </CardHeader>
           <CardContent className="flex flex-col items-center justify-center gap-2 p-4">
@@ -54,7 +54,7 @@ const CardsDrive: React.FC<CardsDriveProps> = ({ items, onAddItem }) => {
             ) : (
               <FolderIcon className="h-6 w-6" />
             )}
-            <div className="text-sm text-muted-foreground">{element.createdAt}</div>
+            <div className="text-sm text-muted-foreground select-none">{element.createdAt}</div>
           </CardContent>
         </Card>
 
