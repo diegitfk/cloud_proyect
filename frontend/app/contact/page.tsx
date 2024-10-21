@@ -88,7 +88,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit }) => {
                       Enviar
                     </div>
                     <div className="absolute right-3.5">
-                      <SendIcon className="w-6 h-6 text-white" />
+                      <SendIcon className="w-6 h-6 !important" />
                     </div>
                   </Button>
                 </div>

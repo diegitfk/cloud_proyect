@@ -9,29 +9,103 @@ body {
 
 @layer base {
   :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 47.4% 11.2%;
+ 
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+ 
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47.4% 11.2%;
+ 
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+ 
+    --card: 0 0% 90%;
+    --card-foreground: 222.2 47.4% 11.2%;
+ 
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+ 
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+ 
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+ 
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 210 40% 98%;
+ 
+    --ring: 215 20.2% 65.1%;
+ 
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%
+  }
+ 
+  .dark {
     --background: 240 5% 6%;
     --foreground: 60 5% 90%;
+
     --primary: 240 0% 90%;
     --primary-foreground: 60 0% 0%;
+
     --secondary: 240 4% 15%;
     --secondary-foreground: 60 5% 85%;
+
     --accent: 240 0% 13%;
     --accent-foreground: 60 0% 100%;
+
     --destructive: 0 60% 50%;
     --destructive-foreground: 0 0% 98%;
+
     --muted: 240 5% 25%;
     --muted-foreground: 60 5% 85%;
+
     --card: 240 4% 10%;
     --card-foreground: 60 5% 90%;
+
     --popover: 240 5% 15%;
     --popover-foreground: 60 5% 85%;
+
     --border: 240 6% 20%;
     --input: 240 6% 20%;
+
     --ring: 240 5% 90%;
     --radius: 0.5rem;
+
+    --sidebar-background: 240 5.9% 10%;
+
+    --sidebar-foreground: 240 4.8% 95.9%;
+
+    --sidebar-primary: 224.3 76.3% 48%;
+
+    --sidebar-primary-foreground: 0 0% 100%;
+
+    --sidebar-accent: 240 3.7% 15.9%;
+
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+
+    --sidebar-border: 240 3.7% 15.9%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%
   }
 }
-
+  
 @layer base {
   * {
     @apply border-border;
@@ -39,4 +113,18 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+  svg {
+    @apply text-black; /* Modo claro por defecto */
+  }
+
+  /* Modo oscuro para SVG */
+  .dark svg {
+    @apply text-white; /* Cambia el color en modo oscuro */
+  }
+}
+
+/* Fix a un error tamaño de icono de SendIcon */
+.\[\&_svg\]\:size-4 svg {
+  width: 24px !important;
+  height: 24px !important;
 }
