@@ -2,6 +2,7 @@ import Link from "next/link"
 import { Button } from "../ui/button"
 import { PlusIcon, TrashIcon, FolderIcon, HomeIcon } from "lucide-react"
 import DrawerElement from "./DrawerElement"
+import { Storage_bar } from "../ui/storage_bar"
 
 type SideBarProps = {
   newFolderName: string;
@@ -48,6 +49,10 @@ export default function SideBar({newFolderName, setNewFolderName, handleCreateFo
           <TrashIcon className="h-4 w-4" />
           Papelera
         </Link>
+
+        {/* BARRA DE ALMACENAMIENTO DISPONIBLE */}
+          <Storage_bar />
+
       </nav>
     </div>
   )

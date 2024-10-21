@@ -7,6 +7,10 @@ from typing import Annotated
 import jwt
 import zipfile
 import subprocess
+import os
+
+ROOT_DIR = os.getenv("ROOT_CLOUD_PATH")
+
 """
     ### Finalidad de este archivo
     Contiene todos los controladores y puntos finales de la api, para el login, 
@@ -37,3 +41,8 @@ async def creating_a_dir(name_dir : Annotated[str , Path(...)] , token : Annotat
 async def received_files(files : UploadFile , token : Annotated[TokenData , Depends(auth_schema)]) -> None:
     with zipfile.ZipFile(files.file , 'r') as zip_ref:
         zip_ref.extractall("/test_extract")
+
+
+@app.get("size_dir_root")
+async def get_dir_size():
+    pass
