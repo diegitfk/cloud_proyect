@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import LogoCloudingDrive from "@/public/icons/cloudicon.svg";
 import { SearchIcon, BellIcon } from 'lucide-react';
+import { ModeToggle } from '@/components/ui/button_mode';
 
 export default function NavBar() {
   return (
@@ -14,6 +15,7 @@ export default function NavBar() {
         <span className="text-lg font-semibold">CloudingDrive</span>
       </Link>
       <nav className="ml-auto flex items-center gap-4">
+        <ModeToggle />
         <Button variant="ghost" size="icon" className="rounded-full">
           <SearchIcon className="h-5 w-5" />
           <span className="sr-only">Buscar</span>

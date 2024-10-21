@@ -6,7 +6,7 @@ export default function BreadCrum() {
   return (
     <>
       {/* Sección de breadcrum, controla la navegación de recorrido por directorios */}
-      <div className="flex items-center gap-4 border-b bg-background p-4 md:px-6">
+      <div className="flex w-full items-center gap-4 border-b bg-background p-4 md:px-6 flex-shrink-0">
         <Breadcrumb className="flex-1">
           <BreadcrumbList>
             <BreadcrumbItem>
