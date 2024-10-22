@@ -14,14 +14,14 @@ export default function PageHome() {
           <CoverParticles />
           <div className="container grid gap-12 px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
+              <div className="space-y-2 select-none">
                 <h2 className="text-3xl font-bold tracking-wide sm:text-5xl animate-fade-down animate-once animate-duration-200 animate-delay-100 animate-ease-out animate-normal animate-fill-backwards">Tu elección es CloudingDrive</h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed animate-fade-right animate-once animate-duration-200 animate-delay-100 animate-ease-out animate-normal animate-fill-backwards">
                   CloudingDrive ofrece una amplia gama de servicios para satisfacer las necesidades del almacenamiento en la NUBE de tu empresa.
                 </p>
               </div>
             </div>
-            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
+            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 select-none">
               <Card className="animate-fade-up animate-once animate-duration-200 animate-delay-100 animate-ease-out animate-normal animate-fill-backwards">
                 <CardContent className="flex flex-col items-center justify-center gap-4 p-8">
                   <RocketIcon className="h-12 w-12 text-primary" />
@@ -71,7 +71,7 @@ export default function PageHome() {
             </div>
           </div>
         </section>
-        <section className="w-full px-20 py-5 mb-5 min-h-screen">
+        <section className="w-full px-20 py-5 mb-5 min-h-screen select-none">
           <div className="flex flex-col items-center justify-center space-y-4 text-center py-5 mb-8">
             <div className="space-y-2">
               <h2 className="text-3xl font-bold tracking-wide sm:text-5xl">Nuestros planes de suscripción</h2>

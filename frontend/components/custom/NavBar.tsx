@@ -14,7 +14,7 @@ export default function NavBar() {
         <LogoCloudingDrive width={38} height={38} />
         <span className="text-lg font-semibold">CloudingDrive</span>
       </Link>
-      <nav className="ml-auto flex items-center gap-4">
+      <nav className="ml-auto select-none flex items-center gap-4">
         <ModeToggle />
         <Button variant="ghost" size="icon" className="rounded-full">
           <SearchIcon className="h-5 w-5" />
