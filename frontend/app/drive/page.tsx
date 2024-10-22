@@ -70,19 +70,6 @@ export default function PageDrive() {
     }
   };
   return (
-<<<<<<< HEAD
-    <>
-      <div className="flex flex-1">
-        <SideBar
-          newFolderName={newFolderName}
-          setNewFolderName={setNewFolderName}
-          handleCreateFolder={handleCreateFolder}
-        />
-        
-        <div className="flex flex-col flex-1">
-          <BreadCrum />
-          <div className="flex-1 overflow-auto p-4 md:px-6">
-=======
     <div className="flex h-full">
       <SideBar
         newFolderName={newFolderName}
@@ -93,7 +80,6 @@ export default function PageDrive() {
         <BreadCrum />
         <div className="flex-1 overflow-auto">
           <div className="p-4 md:px-6">
->>>>>>> db218ee6d1fd72c781141d0383787a2b0c49e585
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               <CardsDrive items={items} onAddItem={addItem} />
             </div>
