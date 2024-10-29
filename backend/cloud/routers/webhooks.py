@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, status
 from fastapi import Request
 from fastapi.exceptions import HTTPException
 from fastapi.responses import JSONResponse
-from models.documents import User , Folder
+from models.documents import User , Folder, PendingShared
 from models.db import engine
 from utils.security import _env_values
 from beanie import init_beanie
@@ -17,7 +17,7 @@ webhook_router = APIRouter(prefix="/webhooks")
 auth_transaction_for = dict()
 
 async def start_session_db():
-    db = init_beanie(database=engine["cloud_db"] , document_models=[User , Folder])
+    db = init_beanie(database=engine["cloud_db"] , document_models=[User , Folder , PendingShared])
     try:
         yield await db
     finally:
@@ -69,15 +69,26 @@ async def config_new_account(new_account : NewAccount , transaction_credentials 
         )
     #Creamos la carpeta en el sistema
     #Todo: Se debe limitar el espacio de la carpeta creada acorde a el plan seleccionado por el usuario
-    proc = await asyncio.create_subprocess_shell(
+    proc_root = await asyncio.create_subprocess_shell(
         cmd=f"mkdir {_env_values.ROOT_CLOUD_PATH}/{str(new_root_folder.folder_name)}",
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE
     )
-    stdout , stderr = await proc.communicate()
+    stdout , stderr = await proc_root.communicate()
     if stderr:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT , detail={"reason" : "err on create dir"})
+    symlink_folder = await asyncio.create_subprocess_shell(
+        cmd=f"mkdir -p {_env_values.ROOT_CLOUD_PATH}/{str(new_root_folder.folder_name)}/.symlinks "
+    )
     #Si no hay error en la carpeta raiz configurada guardamos el usuario y el folder en la base de datos.
+    proc_transfer = await asyncio.create_subprocess_shell(
+        cmd=f"mkdir {_env_values.ROOT_TRANSFER_PATH}/{str(new_root_folder.shared_folder)}"    
+    )
+    stdout , stderr = await proc_transfer.communicate()
+    if stderr:
+        del_cloud_path = await asyncio.create_subprocess_shell(cmd=f"rm -rf {_env_values.ROOT_CLOUD_PATH}/{str(new_root_folder.folder_name)}")
+        await del_cloud_path.communicate() #Eliminamos la carpeta de cloud_root debido a que no se hizo correctamente toda la configuración
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT , detail={"reason" : "err on create shared dir"})
     await new_root_folder.save()
     await new_user.save()
     return JSONResponse(content={"operation" : "success"}, status_code=status.HTTP_201_CREATED)

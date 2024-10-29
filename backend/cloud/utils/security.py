@@ -8,13 +8,13 @@ from datetime import timezone , datetime , timedelta
 from pydantic import BaseModel, Field, HttpUrl
 from dotenv import dotenv_values
 import jwt
-from fastapi.security import OAuth2PasswordBearer
 
 class Env(BaseModel):
     EMPLOYEE_SECRET_KEY : str
     ALGORITHM_JWT : str 
     EXPIRE_TOKEN_MINUTES : int
     ROOT_CLOUD_PATH : str
+    ROOT_TRANSFER_PATH : str
 
 class TokenData(BaseModel):
     """

@@ -13,6 +13,7 @@ from pydantic import EmailStr
 from datetime import timedelta
 import httpx
 
+
 app = FastAPI(root_path="/auth")
 context_crypt = SecurityFlow("sha256_crypt")
 authorization_schema = JwtFlow()

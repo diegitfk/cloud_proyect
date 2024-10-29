@@ -1,7 +1,8 @@
-from fastapi import FastAPI, Form, UploadFile, Path, Query , Body,  Request , status , Response ,Depends
+from fastapi import FastAPI, Form, UploadFile, Path, Query , Body,  Request , status , Response , Depends
 from fastapi.responses import FileResponse, JSONResponse
 from pathlib import Path as PathSys
 from routers.webhooks import webhook_router, start_session_db
+from routers.share import share_router
 from dotenv import dotenv_values
 from utils.sys_management import SysManagement, _env_values
 from models.documents import User , Folder
@@ -18,6 +19,7 @@ import shutil
 auth_schema = JwtFlow()
 app = FastAPI(root_path="/cloud")
 app.include_router(webhook_router)
+app.include_router(share_router)
 #Errores de validacion del token que finalizaran la sesion de la cookie
 @app.exception_handler(DecodeError)
 async def invalid_token_finish_session(req : Request , exc : DecodeError):
@@ -80,22 +82,6 @@ async def creating_a_dir(
     sys_manager = SysManagement(root=_env_values.ROOT_CLOUD_PATH , folder=user.folder)
     await sys_manager.create_dir(name_new_dir=createdir.name_dir , path_on_folder=createdir.path_on_folder)
 
-@app.post("/upload_file")
-async def recept_file(
-        token : Annotated[TokenData , Depends(auth_schema)],
-        file : UploadFile,
-        path : Annotated[Optional[PathSys], Form(...)] = None,
-        session_db = Depends(start_session_db)
-        ):
-    """
-        # Subida de un archivo al sistema
-    """
-    print(f"{file} , {path}")
-    user = await User.find_one(User.username == token.username , fetch_links=True)
-    sys_manager = SysManagement(root=_env_values.ROOT_CLOUD_PATH , folder=user.folder)
-    res = sys_manager.upload_file(file=file , path_on_folder=path)
-    return res
-
 @app.post("/upload_files")
 async def recept_files(
     token : Annotated[TokenData , Depends(auth_schema)] , 
@@ -131,4 +117,3 @@ async def delete_file_tree(
     sys_manager = SysManagement(root=_env_values.ROOT_CLOUD_PATH , folder=user.folder)
     operation = sys_manager.delete_file(filename=filename , path_folder=path.path_on_folder)
     return {"Response" : operation.model_dump()}
-

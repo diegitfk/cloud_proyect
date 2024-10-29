@@ -1,6 +1,6 @@
 from enum import StrEnum
 from typing import List, Optional, Literal, Annotated
-from pydantic import BaseModel , Field
+from pydantic import BaseModel , Field , EmailStr
 from fastapi import Form, UploadFile
 from pathlib import Path
 import os
@@ -9,6 +9,11 @@ import time
 class ItemType(StrEnum):
     DIRECTORY = 'folder'
     FILE = 'file'
+
+class StateShare(StrEnum):
+    PENDING = "pendiente"
+    ACCEPTED = "aceptada"
+    REJECTED = "rechazada"
 
 class ItemFileSystem(BaseModel):
     name : str
@@ -38,6 +43,8 @@ class StructureCurrentPath(BaseModel):
             raise Exception("Error el path actual no es un carpeta")
         list_items = os.listdir(self.current_path)
         for item in list_items:
+            if item.startswith("."):
+                continue
             path_item_on_root_path = self.current_path / item
             item_stat = os.stat(path_item_on_root_path)
             name = os.path.basename(path_item_on_root_path)
@@ -78,3 +85,10 @@ class CreateDir(BaseModel):
 
 class PathOperation(BaseModel):
     path_on_folder : Annotated[Optional[Path] , Field(default=None)] = None
+
+# Models para compartir archivos
+    
+class ShareResourceRequest(BaseModel):
+    name : str
+    path : Path
+    to : Annotated[str , Field(description="Este es el nombre de usuario que recibira los recursos")]
