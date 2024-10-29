@@ -3,8 +3,10 @@ import React, { useEffect, useMemo, useState } from "react";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
 import { type Container, type ISourceOptions, MoveDirection, OutMode,} from "@tsparticles/engine";
 import { loadSlim } from "@tsparticles/slim";
+import { useTheme } from "next-themes";
 
 const CoverParticles: React.FC = () => {
+  const { theme } = useTheme();
   const [init, setInit] = useState(false);
 
   useEffect(() => {
@@ -46,10 +48,10 @@ const CoverParticles: React.FC = () => {
       },
       particles: {
         color: {
-          value: "#ffffff",
+          value: theme === "dark" ? "#ffffff" : "#000000",
         },
         links: {
-          color: "#ffffff",
+          color: theme === "dark" ? "#ffffff" : "#000000",
           distance: 150,
           enable: true,
           opacity: 0.5,
@@ -84,7 +86,7 @@ const CoverParticles: React.FC = () => {
       },
       detectRetina: true,
     }),
-    []
+    [theme]
   );
 
   if (init) {
