@@ -70,32 +70,32 @@ export default function PageDrive() {
     }
   };
   return (
-    <>
-      <div className="flex flex-1">
-        <SideBar
-          newFolderName={newFolderName}
-          setNewFolderName={setNewFolderName}
-          handleCreateFolder={handleCreateFolder}
-        />
-        <div className="flex flex-col flex-1">
-          <BreadCrum />
-          <div className="flex-1 overflow-auto p-4 md:px-6">
+    <div className="flex h-full">
+      <SideBar
+        newFolderName={newFolderName}
+        setNewFolderName={setNewFolderName}
+        handleCreateFolder={handleCreateFolder}
+      />
+      <div className="flex flex-col flex-1 overflow-hidden">
+        <BreadCrum />
+        <div className="flex-1 overflow-auto">
+          <div className="p-4 md:px-6">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               <CardsDrive items={items} onAddItem={addItem} />
             </div>
           </div>
         </div>
-        <DrawerElement
-          newFolderName={newFolderName}
-          setNewFolderName={setNewFolderName}
-          handleCreateFolder={handleCreateFolder}
-        >
-          <Button variant="outline" className="fixed text-white bottom-4 right-4 z-10 md:hidden bg-[#59B47D]">
-            <PlusIcon className="mr-2 h-4 w-4" />
-            Nuevo
-          </Button>
-        </DrawerElement>
       </div>
-    </>
+      <DrawerElement
+        newFolderName={newFolderName}
+        setNewFolderName={setNewFolderName}
+        handleCreateFolder={handleCreateFolder}
+      >
+        <Button variant="outline" className="fixed text-white bottom-4 right-4 z-10 md:hidden bg-[#59B47D]">
+          <PlusIcon className="mr-2 h-4 w-4" />
+          Nuevo
+        </Button>
+      </DrawerElement>
+    </div>
   )
 }

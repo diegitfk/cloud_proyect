@@ -22,11 +22,11 @@ const CoverParticles: React.FC = () => {
   const options: ISourceOptions = useMemo(
     () => ({
       fullScreen: { enable: false },
-      fpsLimit: 120,
+      fpsLimit: 144,
       interactivity: {
         events: {
           onClick: {
-            enable: true,
+            enable: false, /* Este evento ejecuta la creación de particulas */
             mode: "push",
           },
           onHover: {

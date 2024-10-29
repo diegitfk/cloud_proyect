@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import NavBarLayout from '@/components/custom/NavBarLayout'
 import SendIcon from '@/public/icons/sendicon.svg'
+import { useTheme } from 'next-themes'
 
 interface ContactFormProps {
   onSubmit: (name: string, email: string, message: string) => void;
@@ -15,6 +16,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
+  const { theme } = useTheme();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -27,7 +29,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit }) => {
   return (
     <>
       <NavBarLayout />
-      <main className='h-full' style={{
+      <main className='min-h-screen' style={{
         backgroundImage: 'url(/images/background_contact.svg)',
         backgroundSize: 'cover',
         backgroundPosition: 'center'
@@ -40,7 +42,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit }) => {
           </div>
           <div className=" mx-auto p-3 content-center">
             <div className=" max-w-md mx-auto p-8 bg-secondary rounded-lg shadow-lg">
-              <h2 className="text-2xl font-semibold text-gray-100 mb-4 animate-fade-left animate-once animate-duration-200 animate-delay-250 animate-ease-out animate-normal animate-fill-backwards">Contacte con nosotros</h2>
+              <h2 className="text-2xl font-semibold mb-4 animate-fade-left animate-once animate-duration-200 animate-delay-250 animate-ease-out animate-normal animate-fill-backwards">Contacte con nosotros</h2>
               <form onSubmit={handleSubmit}>
                 <div className="mb-4 animate-fade-left animate-once animate-duration-[80ms] animate-delay-200 animate-ease-out animate-normal animate-fill-backwards">
                   <Label className="block mb-2" htmlFor="name">
@@ -88,7 +90,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit }) => {
                       Enviar
                     </div>
                     <div className="absolute right-3.5">
-                      <SendIcon className="w-6 h-6 text-white" />
+                      <SendIcon className="h-6 w-6 text-white" />
                     </div>
                   </Button>
                 </div>
