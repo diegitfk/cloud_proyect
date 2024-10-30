@@ -3,7 +3,7 @@ import Link from "next/link"
 import { Button } from "../ui/button"
 import { PlusIcon, TrashIcon, FolderIcon, HomeIcon } from "lucide-react"
 import DrawerElement from "./DrawerElement"
-import { Storage_bar } from "../ui/storage_bar"
+import { Storage_bar } from "./StorageBar"
 import {
   Sidebar,
   SidebarContent,
