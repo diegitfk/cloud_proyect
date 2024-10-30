@@ -33,16 +33,6 @@ async def expire_token_finish_session(req : Request , exc : ExpiredSignatureErro
     response.delete_cookie("session_jwt")
     return response
 
-@app.get("/tree")
-async def get_current_level_items(
-    token : Annotated[TokenData , Depends(auth_schema)] , 
-    path : Annotated[PathSys , Query(...)] , 
-    session_db = Depends(start_session_db)
-    ):
-    user = await User.find_one( User.username == token.username, fetch_links=True)
-    sys_manager = SysManagement(root=_env_values.ROOT_CLOUD_PATH , folder=user.folder)
-    return await sys_manager.get_current_level(path)
-
 @app.get("/file")
 async def get_file(
     token : Annotated[TokenData , Depends(auth_schema)] , 
@@ -58,6 +48,16 @@ async def get_file(
         media_type="application/octet-stream" , 
         filename=file_path.name
         )
+
+@app.post("/tree")
+async def get_current_level_items(
+    token : Annotated[TokenData , Depends(auth_schema)] , 
+    path : PathOperation , 
+    session_db = Depends(start_session_db)
+    ):
+    user = await User.find_one( User.username == token.username, fetch_links=True)
+    sys_manager = SysManagement(root=_env_values.ROOT_CLOUD_PATH , folder=user.folder)
+    return await sys_manager.get_current_level(path.path_on_folder)
 
 @app.post("/rename_dir/{new_name_dir}")
 async def rename_dir(
@@ -80,7 +80,8 @@ async def creating_a_dir(
     
     user = await User.find_one( User.username == token.username, fetch_links=True)
     sys_manager = SysManagement(root=_env_values.ROOT_CLOUD_PATH , folder=user.folder)
-    await sys_manager.create_dir(name_new_dir=createdir.name_dir , path_on_folder=createdir.path_on_folder)
+    new_dir = await sys_manager.create_dir(name_new_dir=createdir.name_dir , path_on_folder=createdir.path_on_folder)
+    return JSONResponse(content={"new_dir" :new_dir })
 
 @app.post("/upload_files")
 async def recept_files(

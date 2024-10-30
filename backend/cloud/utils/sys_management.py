@@ -88,19 +88,27 @@ class SysManagement:
         tree_structure.current_items_on_path()
         return jsonable_encoder(tree_structure.current_items)
 
-    async def create_dir(self , name_new_dir : str , path_on_folder : Optional[str] = None) -> None:
+    async def create_dir(self , name_new_dir : str , path_on_folder : Optional[str] = None):
         """
             Este metodo cumple el proposito de crear carpetas en el nivel base o anidado del folder asignado 
             al usuario siempre y cuando se pase el path interno necesario con path_folder.
         """
         key_sys = str(uuid.uuid4()) #Este será el atributo extendido de la carpeta
         if path_on_folder is None:
+            structure = StructureCurrentPath(current_path=self.cloud_builder.current_path)
             await self.__run_async_command(f"mkdir -p {str(self.cloud_builder.current_path / name_new_dir)}")
             await self.set_attr(str(self.cloud_builder.current_path / name_new_dir) , "key" , key_sys)
+            structure.current_items_on_path()
+            newItem = structure.get_file_on_current_path(name_new_dir)
+            return jsonable_encoder(newItem)
         else:
             path_new_dir = self.cloud_builder.build_path(Path(path_on_folder))
+            structure = StructureCurrentPath(current_path=path_new_dir)
             await self.__run_async_command(f"mkdir -p {str(path_new_dir / name_new_dir)}")
             await self.set_attr(str(path_new_dir / name_new_dir) , "key" , key_sys) #extendemos el atributo de la carpeta
+            structure.current_items_on_path()
+            newItem = structure.get_file_on_current_path(name_new_dir)
+            return jsonable_encoder(newItem)
 
     async def upload_files(self , files : List[UploadFile] , path_on_folder : Optional[Path] = None) -> Dict[str , Any]:
         copy_tasks = []
