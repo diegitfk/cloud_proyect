@@ -7,8 +7,11 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { Notification } from '@/hooks/useWebSocket';
+import { NotificationDialog } from './NotificationDialog';
+import { useState } from 'react';
 
 interface NotificationBellProps {
     notifications: Notification[];
@@ -24,8 +27,10 @@ interface NotificationBellProps {
     onRemove,
   }: NotificationBellProps) {
     const unreadCount = notifications.filter(n => !n.read).length;
+    const [dialogOpen , setDialogOpen] = useState(false);
   
     return (
+      <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" className="relative">
@@ -39,7 +44,7 @@ interface NotificationBellProps {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-80">
           <div className="flex justify-between items-center p-4 border-b">
-            <span className="font-semibold">Notifications</span>
+            <span className="font-semibold">Notificaciones</span>
             {notifications.length > 0 && (
               <Button
                 variant="ghost"
@@ -51,11 +56,11 @@ interface NotificationBellProps {
               </Button>
             )}
           </div>
-          <ScrollArea className="h-[400px]">
+          <ScrollArea className="h-[300px]">
             <div className="p-4">
               {notifications.length === 0 ? (
                 <div className="text-center py-2 text-muted-foreground">
-                  No notifications
+                  No has recibido notificaciones
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -83,7 +88,7 @@ interface NotificationBellProps {
                             className="text-xs h-7"
                             onClick={() => onMarkAsRead(notification.id)}
                           >
-                            Mark as read
+                            Marcar como leido
                           </Button>
                         )}
                         <Button
@@ -92,7 +97,7 @@ interface NotificationBellProps {
                           className="text-xs h-7"
                           onClick={() => onRemove(notification.id)}
                         >
-                          Remove
+                          eliminar
                         </Button>
                       </div>
                     </div>
@@ -101,7 +106,19 @@ interface NotificationBellProps {
               )}
             </div>
           </ScrollArea>
+          <Button 
+          variant='ghost'
+          size="sm"
+          className='w-full flex justify-center mt-4'
+          onClick={() => setDialogOpen(true)}
+          >Administrar solicitudes de transferencia</Button>
         </DropdownMenuContent>
       </DropdownMenu>
+      <NotificationDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        notifications={notifications}
+      />
+    </>
     );
   }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button"
 import Image from 'next/image';
 import Link from 'next/link';
@@ -8,8 +8,37 @@ import { SearchIcon, BellIcon } from 'lucide-react';
 import { ModeToggle } from '@/components/ui/button_mode';
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
+import { NotificationBell } from '@/components/custom/NotificationBell';
+import { Notification, useWebSocket } from '@/hooks/useWebSocket';
+import { NotificationDialog } from './NotificationDialog';
+import { read } from 'fs';
 
 export default function NavBarDrive() {
+  //Se ajustan aqui callbacks del NotificationBell
+  const [notifications , setNotifications] = useState<Notification[]>([]);
+  const handleNewNotification = (notification: Notification) => {
+    setNotifications(prev => [notification , ...prev]);
+  };
+  const handleMarkAsRead = (id : string) => {
+    setNotifications(prev => 
+      prev.map(notification => 
+        notification.id === id
+        ? {...notification , read: true}
+        : notification
+      )
+    );
+  };
+  const handleRemove = (id : string) => {
+    setNotifications(prev => 
+      prev.filter(notification => notification.id != id)
+    );
+  }
+  const handleClearAll = () => {
+    setNotifications([]);
+  };
+
+  useWebSocket('ws://localhost:8000/cloud/share/ws/notifications/' , handleNewNotification);
+  
   return (
     <>
       <nav className="flex w-full ml-auto p-5 select-non items-center gap-4 justify-between border-b-2">
@@ -27,10 +56,12 @@ export default function NavBarDrive() {
             <SearchIcon className="h-5 w-5" />
             <span className="sr-only">Buscar</span>
           </Button>
-          <Button variant="ghost" size="icon" className="rounded-full">
-            <BellIcon className="h-5 w-5" />
-            <span className="sr-only">Notificaciones</span>
-          </Button>
+          <NotificationBell
+            notifications={notifications}
+            onClearAll={handleClearAll}
+            onMarkAsRead={handleMarkAsRead}
+            onRemove={handleRemove}
+          />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="rounded-full">
