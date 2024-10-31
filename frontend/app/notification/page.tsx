@@ -32,7 +32,7 @@ export default function Home() {
     setNotifications([]);
   };
 
-  useWebSocket('ws://localhost:8000/cloud/share/ws/notifications/diegoxd', handleNewNotification);
+  useWebSocket('ws://localhost:8000/cloud/share/ws/notifications/', handleNewNotification);
 
   return (
     <div className="max-w-7xl mx-auto p-8">

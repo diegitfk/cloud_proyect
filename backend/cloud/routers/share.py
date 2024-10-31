@@ -36,10 +36,13 @@ class ConnectionManagerSockets:
         logger.info(f"{self.__active_connections}")
         
     async def send_notification_user(self , message : str , username : str):
-        if username not in self.__active_connections.keys():
-            print("El usuario no posee sesiones activas")
-        for connection in self.__active_connections[username]:
-            await connection.send_text(message)
+        try:
+            if username not in self.__active_connections.keys():
+                print("El usuario no posee sesiones activas")
+            for connection in self.__active_connections[username]:
+                await connection.send_text(message)
+        except KeyError:
+            ...
 
 share_router = APIRouter(prefix="/share")
 manager_sockets = ConnectionManagerSockets()
@@ -128,11 +131,18 @@ async def transfer_resource_req(
     pending_share = await manager.config_pending_share(request_share_resource.name , request_share_resource.path , user_by , user_to)
     logger.info(f"Solicitud Pendiente Registrada")
     await pending_share.save()
+    #Se envia un mensaje de que se hizo una solicitud de transferencia de recursos
+    await manager_sockets.send_notification_user(message=json.dumps({
+        "event" : "transfer_resource" , 
+        "from" : token.username , 
+        "to" : user_to.username}) , 
+        username=user_to.username)
+    
     return JSONResponse(content={"State" : "Accepted Request"} , status_code=200)
 
 @share_router.put("/accept_share/{id_pending}")
 async def accept_file_req(
-        id_pending : Annotated[str , Path(...)],
+        id_pending : Annotated[str , Path()],
         token : Annotated[TokenData , Depends(auth_schema)],
         session_db = Depends(start_session_db)
     ):
@@ -150,7 +160,11 @@ async def accept_file_req(
     pending_share.state = StateShare.ACCEPTED #Cambio en el estado de la solicitud
     await pending_share.update()
     #Se transfieren el recurso asociado a la solicitud de intercambio de recursos.
-    await manager_sockets.send_notification_user(json.dumps({"event" : "accept_resource" , "from" : token.username , "to" : pending_share.emisor.username}) , pending_share.emisor.username)
+    await manager_sockets.send_notification_user(json.dumps(
+        {"event" : "accept_resource" , 
+         "from" : token.username , 
+         "to" : pending_share.emisor.username
+         }) , pending_share.emisor.username)
     ...
 @share_router.put("/reject_share/{id_pending}")
 async def reject_file_req(
