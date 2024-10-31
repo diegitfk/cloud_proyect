@@ -45,8 +45,8 @@ share_router = APIRouter(prefix="/share")
 manager_sockets = ConnectionManagerSockets()
 auth_schema = JwtFlow()
 #Ruta para crear activar una conexión de un cliente en los websockets
-@share_router.websocket("/ws/notifications/{username}") #Email del usuario que iniciara un sesión con el websocket
-async def sub_to_connection(websocket : WebSocket , username: str):
+@share_router.websocket("/ws/notifications/") #Email del usuario que iniciara un sesión con el websocket
+async def sub_to_connection(websocket : WebSocket , token : TokenData = Depends(auth_schema)):
     """
         Estructura de los eventos entre sockets
         ### Transferencia de recursos
@@ -56,7 +56,7 @@ async def sub_to_connection(websocket : WebSocket , username: str):
             "to" : $USERNAME_SOCKET_RECEIVED_CONNECTION
         }
     """
-    await manager_sockets.connect(websocket , username)
+    await manager_sockets.connect(websocket , token.username)
     try:
         while True:
             received_event = await websocket.receive_text()
@@ -77,7 +77,7 @@ async def sub_to_connection(websocket : WebSocket , username: str):
                 await manager_sockets.send_notification_user(json.dumps(json_sending) , json_sending["to"])
 
     except WebSocketDisconnect:
-        manager_sockets.disconnect(websocket , username)
+        manager_sockets.disconnect(websocket , token.username)
         
     
 @share_router.get("/pending_share")
@@ -112,6 +112,7 @@ async def transfer_resource_req(
     """
         Controller encargado de recibir un archivo o una carpeta del usuario y procesarla 
         para crear una solicitud pendiente.,
+
     """
     user_by = await User.find_one(User.username == token.username , fetch_links=True)
     user_to = await User.find_one(User.username == request_share_resource.to , fetch_links=True)
@@ -129,16 +130,29 @@ async def transfer_resource_req(
     await pending_share.save()
     return JSONResponse(content={"State" : "Accepted Request"} , status_code=200)
 
-@share_router.post("/accept_share/{id_pending}")
-async def accept_file_req():
+@share_router.put("/accept_share/{id_pending}")
+async def accept_file_req(
+        id_pending : Annotated[str , Path(...)],
+        token : Annotated[TokenData , Depends(auth_schema)],
+        session_db = Depends(start_session_db)
+    ):
     """
         Controller encargado de cambiar el estado de la solicitud pendiente a "ACEPTADO"
         además se transfiere una copia mediante un enlace simbolico a la carpeta del usuario
         respectivo en cloud_transfer y se agrega en el nivel inicial.
     """
-    await manager_sockets.send_notification_user(json.dumps({"event" : "accept_resource" , "from" : "tomasxd" , "to" : "diegoxd"}) , "diegoxd")
+    pending_share = await PendingShared.find_one(PendingShared.id == id_pending, fetch_links=True)
+    if pending_share is None:
+        raise HTTPException(
+            status_code=404,
+            detail={"Not exist" : "The request not exist"}
+        )
+    pending_share.state = StateShare.ACCEPTED #Cambio en el estado de la solicitud
+    await pending_share.update()
+    #Se transfieren el recurso asociado a la solicitud de intercambio de recursos.
+    await manager_sockets.send_notification_user(json.dumps({"event" : "accept_resource" , "from" : token.username , "to" : pending_share.emisor.username}) , pending_share.emisor.username)
     ...
-@share_router.post("/reject_share/{id_pending}")
+@share_router.put("/reject_share/{id_pending}")
 async def reject_file_req(
         id_pending : str ,
         token : TokenData = Depends(auth_schema),
