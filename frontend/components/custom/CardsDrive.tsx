@@ -1,6 +1,8 @@
 'use client'
 import React from 'react';
+import useSWR from 'swr';
 import Image from "next/image"
+import { Spinner } from "@/components/ui/spinner"
 import { Card, CardHeader, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
@@ -12,19 +14,21 @@ type DriveItem = {
   id: string; // ID del elemento
   name: string; // Nombre del elemento
   type: "folder" | "file"; // El tipo de elemento a crear
+  size: number; // Tamaño del elemento
   createdAt: string; // Fecha de creación
-  icon: string; // Ruta del icono
 };
 
-type CardsDriveProps = {
-  items: DriveItem[];
-  onAddItem: (item: DriveItem) => void;
-}
+const fetcher = (url: string) => fetch(url).then(res => res.json());
 
-const CardsDrive: React.FC<CardsDriveProps> = ({ items, onAddItem }) => {
+const CardsDrive = () => {
+  const { data, error, isLoading } = useSWR<DriveItem[]>(`/api/tree`, fetcher, { refreshInterval: 10000 });
+  if (isLoading)
+    return <Spinner />;
+  if (error)
+    return <div>Error al cargar las carpetas</div>;
   return (
     <>
-      {items.map((element: DriveItem) => (
+      {data?.map((element: DriveItem) => (
         <Card key={element.id} className="group shadow-md max-w-[260px] cursor-pointer transition-transform duration-200 ease-in-out transform active:scale-95 hover:scale-105">
           <CardHeader className="flex flex-row-reverse items-center justify-center p-2">
             <div className='flex justify-end'>
@@ -57,10 +61,8 @@ const CardsDrive: React.FC<CardsDriveProps> = ({ items, onAddItem }) => {
             <div className="text-sm text-muted-foreground select-none">{element.createdAt}</div>
           </CardContent>
         </Card>
-
       ))}
     </>
   );
 };
-
 export default CardsDrive;
