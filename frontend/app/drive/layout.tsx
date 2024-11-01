@@ -1,5 +1,5 @@
 'use client'
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import NavBarDrive from "@/components/custom/NavBar";
 import PageDrive from "./page";
 import SideBar from "@/components/custom/SideBar";
