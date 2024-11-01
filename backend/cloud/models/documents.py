@@ -53,7 +53,7 @@ class PendingShared(Document):
     linksimb : Annotated[Optional[UUID4] , Field(default=None)] = None #El enlace simbolico asociado a la transferencia    
     state : str #El estado de la transaccion 'PENDING' , 'ACCEPT' , 'REJECT'
     exp : datetime #Tiempo de expiración de los recursos.
-    created_at : Annotated[datetime , Field(default_factory=datetime.now)]
+    created_at : Annotated[datetime , Field(default_factory=datetime.now) , Indexed(expireAfterSeconds=172800)]
     
     class Settings:
         name = "transfers"    

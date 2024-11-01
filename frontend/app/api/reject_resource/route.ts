@@ -11,7 +11,7 @@ export async function PUT(request : NextRequest){
         const idPending = url.searchParams.get("idPending");
 
         const fastapiResponse = await fetch(
-            `http://localhost:8000/cloud/share/accept_share/${idPending?.toString()}`, 
+            `http://localhost:8000/cloud/share/reject_share/${idPending?.toString()}`, 
         {
             method : 'PUT',
             headers : {

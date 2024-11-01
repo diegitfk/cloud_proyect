@@ -65,16 +65,16 @@ async def sub_to_connection(websocket : WebSocket , token : TokenData = Depends(
             received_event = await websocket.receive_text()
             json_sending = json.loads(received_event)
             #Si el evento es una solicitud para transferir recursos
-            if json_sending["event"] == "transfer_resource":
+            if json_sending["event"] == "Transferencia de Recursos":
                 logger.info(f"{json_sending["from"]} quiere transferir recursos a {json_sending["to"]}")
                 await manager_sockets.send_notification_user(json.dumps(json_sending) , user_email=json_sending["to"])
             #Si el evento es una solicitud para aceptar la transferencia de recursos
-            if json_sending["event"] == "accept_resource":
+            if json_sending["event"] == "Transferencia Aceptada":
                 logger.info(f"acepto la transferencia {json_sending["from"]}")
                 logger.info(f"a : {json_sending["to"]}")
                 await manager_sockets.send_notification_user(json.dumps(json_sending) , user_email=json_sending["to"])
             #Si el evento es una solicitud para eliminar la transferencia de recursos.
-            if json_sending["event"] == "reject_resource":
+            if json_sending["event"] == "Transferencia Rechazada":
                 logger.info(f"a rechazado la transferencia {json_sending["from"]}")
                 logger.info(f"A : {json_sending["to"]}")
                 await manager_sockets.send_notification_user(json.dumps(json_sending) , json_sending["to"])
@@ -133,7 +133,7 @@ async def transfer_resource_req(
     await pending_share.save()
     #Se envia un mensaje de que se hizo una solicitud de transferencia de recursos
     await manager_sockets.send_notification_user(message=json.dumps({
-        "event" : "transfer_resource" , 
+        "event" : "Transferencia de Recursos" , 
         "from" : token.username , 
         "to" : user_to.username}) , 
         username=user_to.username)
@@ -151,21 +151,29 @@ async def accept_file_req(
         además se transfiere una copia mediante un enlace simbolico a la carpeta del usuario
         respectivo en cloud_transfer y se agrega en el nivel inicial.
     """
-    pending_share = await PendingShared.find_one(PendingShared.id == id_pending, fetch_links=True)
+    logging.info(f"{id_pending}")
+    pending_share = await PendingShared.get(document_id=id_pending , fetch_links=True)
+    logging.info(f"{pending_share}")
     if pending_share is None:
         raise HTTPException(
             status_code=404,
             detail={"Not exist" : "The request not exist"}
         )
     pending_share.state = StateShare.ACCEPTED #Cambio en el estado de la solicitud
-    await pending_share.update()
+    await pending_share.save()
     #Se transfieren el recurso asociado a la solicitud de intercambio de recursos.
+    #Obtener el elemento por ID en el sistema de archivos
+    #Construir el path en transfer
+    #Copiar al primer nivel
+    
     await manager_sockets.send_notification_user(json.dumps(
-        {"event" : "accept_resource" , 
+        {"event" : "Transferencia Aceptada" , 
          "from" : token.username , 
          "to" : pending_share.emisor.username
          }) , pending_share.emisor.username)
-    ...
+    
+    return JSONResponse(content={"Accepted" : "Transfer Executing"})
+
 @share_router.put("/reject_share/{id_pending}")
 async def reject_file_req(
         id_pending : str ,
@@ -181,4 +189,20 @@ async def reject_file_req(
         Obtener el enlace simbólico del pending
         Eliminar el enlace 
     """
+    pending_share = await PendingShared.get(document_id=id_pending , fetch_links=True)
+    if pending_share is None:
+        raise HTTPException(
+            status_code=404,
+            detail={"Not exist" : "The request not exist"}
+        )
+    pending_share.state = StateShare.REJECTED #Cambio en el estado de la solicitud
+    await pending_share.save()
+    #Se transfieren el recurso asociado a la solicitud de intercambio de recursos.
+    await manager_sockets.send_notification_user(json.dumps(
+        {"event" : "Transferencia Rechazada" , 
+         "from" : token.username , 
+         "to" : pending_share.emisor.username
+         }) , pending_share.emisor.username)
+    
+    return JSONResponse(content={"Accepted" : "Transfer Rejected"})
     

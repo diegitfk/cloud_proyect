@@ -1,5 +1,5 @@
 #docker run -it -p 8000:8000  --name fedora-cloud -v /home/diegocancino/Escritorio/python/cloud_proyect/backend/cloud:/cloud_proyect/backend/cloud cloud-server
-FROM fedora:latest
+FROM fedora:40
 RUN dnf install -y python3 python3-pip git make attr
 WORKDIR /cloud_proyect/backend/cloud
 COPY requirements.txt .

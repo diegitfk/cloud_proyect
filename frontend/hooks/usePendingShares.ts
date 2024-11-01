@@ -31,7 +31,10 @@ export function usePendingShares() {
 
   const handleAccept = async (id: string) => {
     try {
-      await fetcher(`/api/accept_resouce?idPending=${id}`);
+      await fetch(`/api/accept_resource?idPending=${id}` , 
+        {
+          method : "PUT"
+        });
       mutate();
     } catch (error) {
       console.error('Error accepting share:', error);
@@ -40,7 +43,10 @@ export function usePendingShares() {
 
   const handleReject = async (id: string) => {
     try {
-      await fetcher(`/api/reject_resource?idPending=${id}`);
+      await fetch(`/api/reject_resource?idPending=${id}` , 
+        {
+          method : "PUT"
+        });
       mutate();
     } catch (error) {
       console.error('Error rejecting share:', error);
