@@ -209,8 +209,8 @@ async def share_resource_controller(
         token : Annotated[TokenData , Depends(auth_schema)],
         session_db = Depends(start_session_db)
     ):
-    user = await User.find_one(User.username == token.username , fetch_links=True)
-    pending_share = await PendingShared.get(id_pending , fetch_links=True)
+    pending_share = await PendingShared.get(document_id=id_pending , fetch_links=True)
+
     if pending_share.state != StateShare.ACCEPTED:
         raise HTTPException(
             status_code=400 , 
@@ -218,7 +218,15 @@ async def share_resource_controller(
                 "Error Transaction" : f"The request isn´t accepted by {pending_share.receptor.username}"
                 }
             )
-    sys_manager = SysManagement(root=_env_values.ROOT_CLOUD_PATH , folder=user.folder)
+    if pending_share is None:
+        raise HTTPException(
+            status_code=400 , 
+            detail={
+                "Error Transaction" : f"The request not exist"
+                }
+            )
+    sys_manager = SysManagement(root=_env_values.ROOT_CLOUD_PATH , folder=pending_share.emisor.folder)
+
     await sys_manager.transfer_resource(pending_share)
     return JSONResponse(
         {

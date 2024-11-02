@@ -239,8 +239,8 @@ class SysManagement:
         )
     async def transfer_resource(self , pending_request : PendingShared) -> None:
         #Busqueda del recurso y producción de la ruta del enlace simbolico.
-        resource_path = await self.__get_resource_by_attr(pending_request.key_resource)
         generated_linksim = self.__generate_symlink(user_to=pending_request.receptor , symlink_id=str(pending_request.linksimb)) #Creamos un enlace simbolico temporal
+        resource_path = await self.__get_resource_by_attr(pending_request.key_resource)
         symlinks_base = self.cloud_builder.build_path(Path(".symlinks"))
         symlink_path_destination = symlinks_base / f"{str(pending_request.linksimb)}"
 

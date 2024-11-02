@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef} from 'react';
+import { use, useEffect, useRef, useState} from 'react';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -17,6 +17,10 @@ export interface Notification{
 
 export const useWebSocket = (url: string , onNotification? : (notification: Notification) => void) => {
   const ws = useRef<WebSocket | null>(null);
+  const [isConnected , setIsConnected] = useState(false);
+  const reconnectTimeout = useRef<NodeJS.Timeout>();
+  const maxReconnectAttempts = 5;
+  const reconnectAttempts = useRef(0);
 
   const handleTransferAccepted = async (data : any) => {
     try{
@@ -25,7 +29,15 @@ export const useWebSocket = (url: string , onNotification? : (notification: Noti
         {
           method : 'PUT',
         });
-      console.log(await response.json());
+
+        if (!response.ok) {
+          throw new Error('Failed to process transfer');
+        }
+  
+        const result = await response.json();
+        toast.success('Transfer processed successfully', {
+          description: result.message,
+        });
 
     }catch (error){
       console.error('Error processing transfer:', error);
@@ -62,60 +74,81 @@ export const useWebSocket = (url: string , onNotification? : (notification: Noti
         });
     }
   };
+  const connect = () => {
+    try {
+      ws.current = new WebSocket(url);
 
-  useEffect(() => {
-    ws.current = new WebSocket(url);
-
-    ws.current.onopen = () => {
-      toast.success('Connected to notification service');
-    };
-
-    ws.current.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        console.log(data);
-
-        if (data.event === "Transferencia Aceptada"){
-          handleTransferAccepted(data);
+      ws.current.onopen = () => {
+        setIsConnected(true);
+        reconnectAttempts.current = 0;
+        if (!isConnected) {
+          toast.success('Connected to notification service');
         }
-        
-        //Interface de la notificación
-        const notification: Notification = {
-          id : uuidv4(),
-          eventType : data.event,
-          from : data.from,
-          to : data.to,
-          timestamp: new Date(),
-          read : false,
-        };     
-        console.log(notification);   
-        // Show toast
-        showToastByEventType(notification);
-        onNotification?.(notification);
-      } catch (error) {
-        console.error('Error parsing notification:', error);
-      }
-    };
+      };
 
-    ws.current.onerror = (error) => {
-      console.error('WebSocket error:', error);
-      toast.error('Connection Error', {
-        description: 'Failed to connect to notification service',
-      });
-    };
+      ws.current.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          
+          if (data.event === 'Transferencia Aceptada') {
+            handleTransferAccepted(data);
+          }
 
-    ws.current.onclose = () => {
-      toast.warning('Disconnected', {
-        description: 'Lost connection to notification service',
-      });
-    };
+          const notification: Notification = {
+            id: uuidv4(),
+            eventType: data.event,
+            from: data.from,
+            to: data.to,
+            timestamp: new Date(),
+            read: false,
+          };
+          
+          showToastByEventType(notification);
+          onNotification?.(notification);
+        } catch (error) {
+          console.error('Error parsing notification:', error);
+        }
+      };
+
+      ws.current.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        setIsConnected(false);
+      };
+
+      ws.current.onclose = () => {
+        setIsConnected(false);
+        if (reconnectAttempts.current < maxReconnectAttempts) {
+          const timeoutDuration = Math.min(1000 * Math.pow(2, reconnectAttempts.current), 10000);
+          reconnectTimeout.current = setTimeout(() => {
+            reconnectAttempts.current += 1;
+            connect();
+          }, timeoutDuration);
+        } else {
+          toast.error('Connection failed', {
+            description: 'Unable to establish a stable connection to the notification service',
+          });
+        }
+      };
+    } catch (error) {
+      console.error('Connection error:', error);
+      setIsConnected(false);
+    }
+  };
+  useEffect(() => {
+    connect();
 
     return () => {
+      if (reconnectTimeout.current) {
+        clearTimeout(reconnectTimeout.current);
+      }
       if (ws.current) {
         ws.current.close();
       }
     };
   }, [url]);
 
-  return { ws: ws.current};
+  return { 
+    ws: ws.current,
+    isConnected 
+  };
 };

@@ -37,7 +37,7 @@ export default function NavBarDrive() {
     setNotifications([]);
   };
 
-  useWebSocket('ws://localhost:8000/cloud/share/ws/notifications/' , handleNewNotification);
+  const {ws , isConnected} = useWebSocket('ws://localhost:8000/cloud/share/ws/notifications/' , handleNewNotification);
   
   return (
     <>
