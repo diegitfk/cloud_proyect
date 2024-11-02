@@ -9,12 +9,14 @@ from pathlib import Path
 from utils.security import _env_values
 from concurrent.futures import ThreadPoolExecutor
 import subprocess
+import zipfile
 import uuid 
 import shutil
 import asyncio
 import os
 import xattr
 import datetime
+import logging
 
 class ComandError(Exception):
     def __init__(self, message : str) -> None:
@@ -30,9 +32,9 @@ class NotConstructBasePath(Exception):
     def __str__(self) -> str:
         return f"[Error]: {self.message}"
 
-
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
     
-
 class SysManagement:
     def __init__(self , root : str , folder : Folder) -> None:
         self.cloud_builder = (
@@ -173,19 +175,23 @@ class SysManagement:
             raise HTTPException(status_code=403 , detail="No posees permisos")
         ...
     
-    def __generate_symlink(self , user_to : User) -> uuid.UUID:
+    def __generate_uuid_symlink(self) -> uuid.UUID:
+        return uuid.uuid4()
+    
+    def __generate_symlink(self , user_to : User , symlink_id : str) -> bool:
         temp_symlinks_dir = self.cloud_builder.build_path(".symlinks/") #Referencia  a la carpeta de enlaces simbolicos
-        symlink_id = uuid.uuid4()
-        symlink_dir = temp_symlinks_dir / str(symlink_id) # uuid_user/.symlinks/uuid_symlink enlace simbolico para que el usuario transfiera recursos
+        symlink_dir = temp_symlinks_dir / symlink_id # uuid_user/.symlinks/uuid_symlink enlace simbolico para que el usuario transfiera recursos
         builder_share = (
             BuilderTransferPath(root=_env_values.ROOT_TRANSFER_PATH)
             .build_folder_path(user_to.folder)
         ) #Direccion donde se encuentra el archivo de transferidos para el usuario que se enviarán archivos
         try:
             os.symlink(builder_share.current_path , symlink_dir)
-            return symlink_id
+            return True
         except OSError:
             print("Hubo un erro al crear espacios de transferencia.")
+            return False
+
     
     async def __get_info_resource(self , name_resource : str , path_folder : Optional[Path] = None ) -> Optional[Dict[str , Any]]:
         if path_folder is None:
@@ -218,7 +224,7 @@ class SysManagement:
             user_to : User
         ) -> PendingShared:
         info_resource = await self.__get_info_resource(name_resource , path_folder)
-        symlink_share = self.__generate_symlink(user_to) #Configuración del enlace simbolico
+        symlink_share = self.__generate_uuid_symlink() #Configuración del enlace simbolico
         
         return PendingShared(
             emisor=user_by , 
@@ -231,4 +237,51 @@ class SysManagement:
             state=StateShare.PENDING,
             exp=datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=2) #Tiempo de expiración del enlace simbolico para hacer valida la transferencia de datos
         )
+    async def transfer_resource(self , pending_request : PendingShared) -> None:
+        #Busqueda del recurso y producción de la ruta del enlace simbolico.
+        resource_path = await self.__get_resource_by_attr(pending_request.key_resource)
+        generated_linksim = self.__generate_symlink(user_to=pending_request.receptor , symlink_id=str(pending_request.linksimb)) #Creamos un enlace simbolico temporal
+        symlinks_base = self.cloud_builder.build_path(Path(".symlinks"))
+        symlink_path_destination = symlinks_base / f"{str(pending_request.linksimb)}"
+
+        #Transferir el recurso si es carpeta se comprime en zip y si no se copia a la ruta que apunta el enlace simbolico
+        if resource_path.is_dir():
+            logger.info(f"Nombre de la carpeta: {resource_path.name}")
+            zip_name = resource_path.name + ".zip"
+            zip_path_destino = symlink_path_destination / Path(f"{zip_name}") #Para que se cree dentro de la carpeta de transferidos del usuario receptor
+            with zipfile.ZipFile(zip_path_destino , "w") as zipf:
+                for file in resource_path.glob("*"):
+                    zipf.write(file , arcname=file.name)
+        else:
+            symlink_path_destination_file = symlink_path_destination / f"{str(resource_path.name)}"
+            shutil.copyfile(resource_path , symlink_path_destination_file)
+        #Eliminar el enlace simbólico
+        symlink_path_destination.unlink() #Se elimina el enlace simbolico temporal para la transferencia de recursos
+
+
+    async def __get_resource_by_attr(self , attr_value : uuid.UUID , attr_name : str = "key") -> Optional[Path]:
+        """
+        Esta función es la encargada de por ID encontrar en la raiz del usuario un archivo especifico,que tenga el valor `attr_value`
+        en el `attr_name` establecido previamente, esto devuelve el path completo del archivo.
+        """
+        # ROOT : CARPETA , FILES : ARCHIVOS EN ROOT
+        match_resource : Optional[str] = None
+        for root , _ , files in os.walk(self.cloud_builder.current_path): #Iterando sobre la estructura de directorios de la raiz del usuario
+            try:
+                attr_root = await self.get_attr(root, attr_name)
+                if attr_root == str(attr_value):
+                    match_resource = Path(root)
+                    break  # Salimos del bucle si encontramos el recurso
+            except OSError:
+                ...
+            for file in files:
+                filepath = os.path.join(root , file) #concatenamos la carpeta al nombre del archivo para obtener el path completo.
+                try:
+                    attr_file = await self.get_attr(filepath , attr_name)
+                    logger.info(f"PATH -> [{filepath}] : UUID -> [{attr_file}]")
+                    if attr_file == str(attr_value):
+                        match_resource = Path(filepath)
+                except OSError:
+                    ...
+        return match_resource
             
