@@ -58,6 +58,7 @@ async def sub_to_connection(websocket : WebSocket , token : TokenData = Depends(
             "from" : $USERNAME_SOCKET_SENDING_CONNECTION,
             "to" : $USERNAME_SOCKET_RECEIVED_CONNECTION
         }
+        Si el evento es accept_resource se agrega la llave id_pending que es el id de la solicitud que se acepto.
     """
     await manager_sockets.connect(websocket , token.username)
     try:
@@ -161,15 +162,11 @@ async def accept_file_req(
         )
     pending_share.state = StateShare.ACCEPTED #Cambio en el estado de la solicitud
     await pending_share.save()
-    #Se transfieren el recurso asociado a la solicitud de intercambio de recursos.
-    #Obtener el elemento por ID en el sistema de archivos
-    #Construir el path en transfer
-    #Copiar al primer nivel
-    
     await manager_sockets.send_notification_user(json.dumps(
         {"event" : "Transferencia Aceptada" , 
          "from" : token.username , 
-         "to" : pending_share.emisor.username
+         "to" : pending_share.emisor.username,
+         "id_pending" : str(pending_share.id) 
          }) , pending_share.emisor.username)
     
     return JSONResponse(content={"Accepted" : "Transfer Executing"})
@@ -205,4 +202,27 @@ async def reject_file_req(
          }) , pending_share.emisor.username)
     
     return JSONResponse(content={"Accepted" : "Transfer Rejected"})
-    
+
+@share_router.put("/share_resource/{id_pending}")
+async def share_resource_controller(
+        id_pending : Annotated[str , Path()],
+        token : Annotated[TokenData , Depends(auth_schema)],
+        session_db = Depends(start_session_db)
+    ):
+    user = await User.find_one(User.username == token.username , fetch_links=True)
+    pending_share = await PendingShared.get(id_pending , fetch_links=True)
+    if pending_share.state != StateShare.ACCEPTED:
+        raise HTTPException(
+            status_code=400 , 
+            detail={
+                "Error Transaction" : f"The request isn´t accepted by {pending_share.receptor.username}"
+                }
+            )
+    sys_manager = SysManagement(root=_env_values.ROOT_CLOUD_PATH , folder=user.folder)
+    await sys_manager.transfer_resource(pending_share)
+    return JSONResponse(
+        {
+        "resource" : f"{pending_share.name}" , 
+        "to" : f"{pending_share.receptor.username}"
+        }
+    )
