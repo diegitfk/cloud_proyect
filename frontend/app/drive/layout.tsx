@@ -1,7 +1,7 @@
 'use client'
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import NavBarDrive from "@/components/custom/NavBarDrive";
-import PageDrive from "./page";
+import PageDrive from "./[[...path]]/page";
 import PageShared from "./shared/page";
 import PageTrash from "./trash/page";
 import SideBar from "@/components/custom/SideBar";
