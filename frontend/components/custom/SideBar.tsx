@@ -17,9 +17,10 @@ type SideBarProps = {
   newFolderName: string;
   setNewFolderName: (name: string) => void;
   handleCreateFolder: () => void;
+  setActiveView: (view: string) => void;
 }
 
-export default function SideBar({ newFolderName, setNewFolderName, handleCreateFolder }: SideBarProps) {
+export default function SideBar({ newFolderName, setNewFolderName, handleCreateFolder, setActiveView }: SideBarProps) {
   return (
     <Sidebar variant="sidebar" className="border-r w-64">
       {/* Encabezado del Sidebar */}
@@ -43,22 +44,25 @@ export default function SideBar({ newFolderName, setNewFolderName, handleCreateF
             href="/drive"
             className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-muted"
             prefetch={false}
+            onClick={() => setActiveView("mi-almacenamiento")}
           >
             <HomeIcon className="h-4 w-4" />
             Mi Almacenamiento
           </Link>
           <Link
-            href="#"
+            href="/drive/shared"
             className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-muted"
             prefetch={false}
+            onClick={() => setActiveView("compartidos-conmigo")}
           >
             <FolderIcon className="h-4 w-4" />
             Compartido conmigo
           </Link>
           <Link
-            href="#"
+            href="/drive/trash"
             className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-muted"
             prefetch={false}
+            onClick={() => setActiveView("papelera")}
           >
             <TrashIcon className="h-4 w-4" />
             Papelera

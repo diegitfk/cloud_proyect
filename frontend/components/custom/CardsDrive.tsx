@@ -1,13 +1,13 @@
 'use client'
 import React from 'react';
 import useSWR from 'swr';
-import Image from "next/image"
 import { Spinner } from "@/components/ui/spinner"
 import { Card, CardHeader, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import FileIcon from "@/public/icons/fileicon.svg"
 import FolderIcon from "@/public/icons/foldericon.svg"
+import { Ellipsis } from "lucide-react"
 
 // Este type maneja la estructura del Json que se enviará al BackEnd
 type DriveItem = {
@@ -65,7 +65,7 @@ const CardsDrive = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="rounded-full select-none">
-                    <Image src='icons/movehorizontal.svg' alt='imagen' width={24} height={24} />
+                    <Ellipsis className="h-6 w-6" />
                     <span className="select-none sr-only">Más opciones</span>
                   </Button>
                 </DropdownMenuTrigger>

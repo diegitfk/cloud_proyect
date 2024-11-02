@@ -1,12 +1,16 @@
 'use client'
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import NavBarDrive from "@/components/custom/NavBar";
+import NavBarDrive from "@/components/custom/NavBarDrive";
 import PageDrive from "./page";
+import PageShared from "./shared/page";
+import PageTrash from "./trash/page";
 import SideBar from "@/components/custom/SideBar";
 import useDriveStore from '@/states/useDriveState';
+import { useState } from "react";
 
 export default function LayoutDrive() {
   const { newFolderName, setNewFolderName, handleCreateFolder } = useDriveStore();
+  const [activeView, setActiveView] = useState("mi-almacenamiento");
 
   return (
     <SidebarProvider>
@@ -15,10 +19,13 @@ export default function LayoutDrive() {
           newFolderName={newFolderName}
           setNewFolderName={setNewFolderName}
           handleCreateFolder={handleCreateFolder}
+          setActiveView={setActiveView}
         />
         <SidebarInset className="flex flex-col flex-grow">
           <NavBarDrive />
-          <PageDrive />
+          {activeView === "mi-almacenamiento" && <PageDrive />}
+          {activeView === "compartidos-conmigo" && <PageShared />}
+          {activeView === "papelera" && <PageTrash />}
         </SidebarInset>
       </main>
     </SidebarProvider>
