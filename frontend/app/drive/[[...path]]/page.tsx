@@ -6,6 +6,7 @@ import CardsDrive from "@/components/custom/CardsDrive"
 import DrawerElement from "@/components/custom/DrawerElement"
 import BreadCrum from "@/components/custom/BreadCrum"
 import useDriveStore from '@/states/useDriveState'
+import { useParams } from 'next/navigation'
 
 type DriveItem = {
   id: string;
@@ -16,14 +17,18 @@ type DriveItem = {
 };
 
 export default function PageDrive() {
+  const params = useParams();
   const { newFolderName, setNewFolderName, addItem } = useDriveStore();
+
+  // Obtener la ruta actual de los parámetros de la URL
+  const currentPath = Array.isArray(params.path) ? `/${params.path.join('/')}` : '/';
 
   const handleCreateFolder = () => {
     if (newFolderName.trim() !== "") {
-      const newFolder: DriveItem = {
+      const newFolder: DriveItem = { 
         id: Date.now().toString(), // Genera un ID único
-        name: newFolderName,
-        type: "folder", // Asegúrate de que el tipo sea "folder" o "file"
+        name: newFolderName, 
+        type: "folder", // Asegúrate de que el tipo sea "folder"
         createdAt: new Date().toLocaleDateString(),
         icon: "/icons/foldericon.svg"
       };
@@ -38,7 +43,7 @@ export default function PageDrive() {
       <div className="flex-1 overflow-auto">
         <div className="p-4 md:px-6">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            <CardsDrive />
+          <CardsDrive currentPath={currentPath === '/' ? '' : currentPath} />
           </div>
         </div>
       </div>
