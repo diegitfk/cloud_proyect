@@ -17,21 +17,39 @@ export interface Notification{
 
 export const useWebSocket = (url: string , onNotification? : (notification: Notification) => void) => {
   const ws = useRef<WebSocket | null>(null);
+
+  const handleTransferAccepted = async (data : any) => {
+    try{
+      const response = await fetch(
+        `/api/share_resource?idPending=${data.id_pending}` , 
+        {
+          method : 'PUT',
+        });
+      console.log(await response.json());
+
+    }catch (error){
+      console.error('Error processing transfer:', error);
+      toast.error('Transfer processing failed', {
+        description: 'Could not complete the transfer process',
+      });
+    }
+  }
+
   const showToastByEventType = (notification: Notification) => {
     switch (notification.eventType) {
-      case 'accept_resource':
+      case 'Transferencia Aceptada':
         toast.success(notification.from, {
           description: notification.to,
           duration: 5000,
         });
         break;
-      case 'reject_resource':
+      case 'Transferencia Rechazada':
         toast.error(notification.from, {
           description: notification.to,
           duration: 5000,
         });
         break;
-      case 'transfer_resource':
+      case 'Transferencia de Recursos':
         toast.info(notification.from, {
             description: notification.to,
             duration: 5000,
@@ -56,6 +74,11 @@ export const useWebSocket = (url: string , onNotification? : (notification: Noti
       try {
         const data = JSON.parse(event.data);
         console.log(data);
+
+        if (data.event === "Transferencia Aceptada"){
+          handleTransferAccepted(data);
+        }
+        
         //Interface de la notificación
         const notification: Notification = {
           id : uuidv4(),
