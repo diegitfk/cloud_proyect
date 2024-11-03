@@ -17,6 +17,7 @@ import os
 import xattr
 import datetime
 import logging
+import inspect
 
 class ComandError(Exception):
     def __init__(self, message : str) -> None:
@@ -285,3 +286,37 @@ class SysManagement:
                     ...
         return match_resource
             
+
+class SysManagementShareResources(SysManagement):
+    allowed_methods = [
+        "get_current_level",
+        "set_attr",
+        "get_attr",
+        "__run_async_command",
+        "transfer_builder",
+        "src_download"
+    ]
+    def __init__(self, root: str, folder: Folder) -> None:
+        self.transfer_builder = ( #Contrucción del Path base del usuario en /cloud_transfer/
+            BuilderTransferPath(root)
+            .build_folder_path(folder)
+            )
+    def __getattribute__(self, name: str) -> Any:
+        allowed_methods = object.__getattribute__(self , "allowed_methods")
+        if name not in allowed_methods:
+            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
+        return super().__getattribute__(name)
+    
+    def get_current_level(self) -> Dict[str, Any]:
+        tree_structure = StructureCurrentPath(current_path=self.transfer_builder.current_path)
+        tree_structure.current_items_on_path()
+        return jsonable_encoder(tree_structure.current_items)
+
+    def src_download(self , name_file : str) -> Path:
+        base = self.transfer_builder.current_path
+        down = base / Path(name_file)
+        if not down.exists():
+            raise Exception("Not exist this file")
+        return down
+        
+        
