@@ -28,6 +28,8 @@
     "axios": "^1.7.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "cmdk": "1.0.0",
+    "date-fns": "^4.1.0",
     "embla-carousel-react": "^8.3.0",
     "filepond": "^4.31.4",
     "filepond-plugin-file-validate-type": "^1.2.9",

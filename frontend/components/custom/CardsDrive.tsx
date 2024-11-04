@@ -9,7 +9,8 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import FileIcon from "@/public/icons/fileicon.svg"
 import FolderIcon from "@/public/icons/foldericon.svg"
 import { Ellipsis } from "lucide-react"
-import useDriveState from '@/states/useDriveState'
+import { ShareDialog } from './ShareDialog';
+import { useState } from 'react';import useDriveState from '@/states/useDriveState'
 
 
 // Este type maneja la estructura del Json que se enviará al BackEnd
@@ -53,9 +54,17 @@ const CardsDrive = () => {
     const pathFromUrl = pathname.replace('/drive', '').replace(/^\/+|\/+$/g, '');
     setPath(pathFromUrl);
   }, [pathname, setPath]);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<DriveItem | null>(null);
+
 
   const handleFolderClick = (folderPath: string) => {
     router.push(`/drive/${folderPath}`);
+  };
+  const handleShareClick = (event: React.MouseEvent, item: DriveItem) => {
+    event.stopPropagation();
+    setSelectedItem(item);
+    setShareDialogOpen(true);
   };
 
   if (isLoading) 
@@ -96,7 +105,7 @@ const CardsDrive = () => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem>Abrir</DropdownMenuItem>
-                    <DropdownMenuItem>Compartir</DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => handleShareClick(e , element)}>Compartir</DropdownMenuItem>
                     <DropdownMenuItem>Renombrar</DropdownMenuItem>
                     <DropdownMenuItem>Mover a</DropdownMenuItem>
                     <DropdownMenuItem  className='text-red-500'>Eliminar</DropdownMenuItem>
@@ -119,6 +128,17 @@ const CardsDrive = () => {
             </CardContent>
           </Card>
         ))
+      )}
+      {selectedItem && (
+        <ShareDialog
+          isOpen={shareDialogOpen}
+          onClose={() => {
+            setShareDialogOpen(false);
+            setSelectedItem(null);
+          }}
+          itemName={selectedItem.name}
+          itemPath={selectedItem.path}
+        />
       )}
     </>
   );

@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Path , Query , Depends , WebSocket , WebSocketDisconnect
 from fastapi.exceptions import HTTPException
 from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from typing import Optional , List , Dict , Annotated
-from models.documents import PendingShared , User , Folder , PendingShareView
+from models.documents import PendingShared , User , Folder , PendingShareView, UserView
 from models.models import ShareResourceRequest , StateShare
-from utils.sys_management import SysManagement
+from utils.sys_management import SysManagement, SysManagementShareResources
 from utils.security import JwtFlow , _env_values , TokenData
 from routers.webhooks import start_session_db
 from pathlib import Path
@@ -106,6 +106,38 @@ async def get_all_pending_shareds(
                 "shared_pending" : jsonable_encoder(pending_shareds)
             }
         )
+@share_router.get("/transfers")
+async def transfers_controller(
+        token : Annotated[TokenData , Depends(auth_schema)],
+        session_db = Depends(start_session_db)
+    ):
+    user = await User.find_one(User.username == token.username , fetch_links=True)
+    transfer_manager = SysManagementShareResources(_env_values.ROOT_TRANSFER_PATH , user.folder)
+    return transfer_manager.get_current_level()
+
+@share_router.get("/download_resource/")
+async def download_resource(
+    name : Annotated[str , Query(...)],
+    token : Annotated[TokenData , Depends(auth_schema)] , 
+    session_db = Depends(start_session_db)
+    ):
+    user = await User.find_one( User.username == token.username, fetch_links=True)
+    transfer_manager = SysManagementShareResources(_env_values.ROOT_TRANSFER_PATH , user.folder)
+    file_download = transfer_manager.src_download(name)
+    return FileResponse(
+        path=file_download , 
+        headers={"Content-Disposition" : f"attachment; filename={file_download.name}"},
+        media_type="application/octet-stream" , 
+        filename=file_download.name
+        )
+@share_router.get("/users")
+async def get_users_info(
+        token : Annotated[TokenData , Depends(auth_schema)],
+        session_db = Depends(start_session_db)
+    ):
+    users = await User.find_all().project(UserView).to_list()
+    return JSONResponse(content={"users" : jsonable_encoder(users)})
+
 
 @share_router.post("/transfer_resource")
 async def transfer_resource_req(
