@@ -5,20 +5,16 @@ import PageDrive from "./[[...path]]/page";
 import PageShared from "./shared/page";
 import PageTrash from "./trash/page";
 import SideBar from "@/components/custom/SideBar";
-import useDriveStore from '@/states/useDriveState';
+import useDriveState from '@/states/useDriveState';
 import { useState } from "react";
 
 export default function LayoutDrive() {
-  const { newFolderName, setNewFolderName, handleCreateFolder } = useDriveStore();
   const [activeView, setActiveView] = useState("mi-almacenamiento");
 
   return (
     <SidebarProvider>
       <main className="flex h-screen w-full">
         <SideBar 
-          newFolderName={newFolderName}
-          setNewFolderName={setNewFolderName}
-          handleCreateFolder={handleCreateFolder}
           setActiveView={setActiveView}
         />
         <SidebarInset className="flex flex-col flex-grow">

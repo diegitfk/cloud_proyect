@@ -1,6 +1,6 @@
 'use client'
-import React from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import useSWR from 'swr';
 import { Spinner } from "@/components/ui/spinner"
 import { Card, CardHeader, CardContent } from "@/components/ui/card"
@@ -9,6 +9,8 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import FileIcon from "@/public/icons/fileicon.svg"
 import FolderIcon from "@/public/icons/foldericon.svg"
 import { Ellipsis } from "lucide-react"
+import useDriveState from '@/states/useDriveState'
+
 
 // Este type maneja la estructura del Json que se enviará al BackEnd
 type DriveItem = {
@@ -19,10 +21,6 @@ type DriveItem = {
   created_at: string; // Fecha de creación
   path: string;
 };
-
-interface CardsDriveProps {
-  currentPath: string;
-}
 
 const fetcher = async (url: string, path: string): Promise<DriveItem[]> => {
   const response = await fetch(url, {
@@ -41,12 +39,20 @@ const fetcher = async (url: string, path: string): Promise<DriveItem[]> => {
   return data.tree;
 };
 
-const CardsDrive: React.FC<CardsDriveProps> = ({ currentPath }) => {
+const CardsDrive = () => {
+  const { getCurrentPath, setPath } = useDriveState();
   const router = useRouter();
+  const pathname = usePathname();
+  const currentPath = getCurrentPath(); // Usamos getCurrentPath para obtener el path normalizado
   const { data, error, isLoading } = useSWR(['/api/tree', currentPath], ([url, path]) => fetcher(url, path), {
     refreshInterval: 10000, // Refresca cada 10 segundos
     revalidateOnFocus: true,
   });
+
+  useEffect(() => {
+    const pathFromUrl = pathname.replace('/drive', '').replace(/^\/+|\/+$/g, '');
+    setPath(pathFromUrl);
+  }, [pathname, setPath]);
 
   const handleFolderClick = (folderPath: string) => {
     router.push(`/drive/${folderPath}`);
@@ -93,7 +99,7 @@ const CardsDrive: React.FC<CardsDriveProps> = ({ currentPath }) => {
                     <DropdownMenuItem>Compartir</DropdownMenuItem>
                     <DropdownMenuItem>Renombrar</DropdownMenuItem>
                     <DropdownMenuItem>Mover a</DropdownMenuItem>
-                    <DropdownMenuItem>Eliminar</DropdownMenuItem>
+                    <DropdownMenuItem  className='text-red-500'>Eliminar</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>

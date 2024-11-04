@@ -14,22 +14,15 @@ import {
 } from "@/components/ui/sidebar"
 
 type SideBarProps = {
-  newFolderName: string;
-  setNewFolderName: (name: string) => void;
-  handleCreateFolder: () => void;
   setActiveView: (view: string) => void;
 }
 
-export default function SideBar({ newFolderName, setNewFolderName, handleCreateFolder, setActiveView }: SideBarProps) {
+export default function SideBar({ setActiveView }: SideBarProps) {
   return (
     <Sidebar variant="sidebar" className="border-r w-64">
       {/* Encabezado del Sidebar */}
       <SidebarHeader className="mt-4">
-        <DrawerElement
-          newFolderName={newFolderName}
-          setNewFolderName={setNewFolderName}
-          handleCreateFolder={handleCreateFolder}
-        >
+        <DrawerElement>
           <Button variant="outline" className="w-full hover:bg-[#59B47D] hover:text-white">
             <PlusIcon className="mr-2 h-4 w-4" />
             Nuevo
