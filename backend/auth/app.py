@@ -58,6 +58,16 @@ async def expire_token_finish_session(req : Request , exc : ExpiredSignatureErro
     response.delete_cookie("session_jwt")
     return response
 
+# FUNCION QUE DEVUELVE EL LIMITE DEL PLAN DEL USUARIO
+@app.get("/get_plan_memory")
+async def get_plan_memory(register_user_data: UserSign, start_session_db = Depends(start_db)):
+    user_on_db = await User.find(Or(User.email == register_user_data.email, User.username == register_user_data.username)).first_or_none()
+    if user_on_db:
+        raise HTTPException({"reason": "actually this email or username is register on system try with other username or email"})
+    plan_memory = await Plan.limit_memory
+    
+    return plan_memory
+
 #Endpoint de Sign al sistema.
 @app.post("/sign")
 async def sign_on_sys(register_user_data : UserSign , start_session_db = Depends(start_db)):

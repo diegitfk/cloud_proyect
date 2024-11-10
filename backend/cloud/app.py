@@ -71,6 +71,28 @@ async def rename_dir(
     sys_manager = SysManagement()
     await sys_manager.rename_file_or_folder(folder=user.folder , new_name=new_name_dir , path_folder=path)
 
+# AQUI IRA LA OPCION DE LEER EL DIRECTORIO
+@app.get("/get_diroot_size")
+async def get_dir(
+    token : Annotated[TokenData , Depends(auth_schema)] , 
+    session_db = Depends(start_session_db)
+) -> float:
+    user = await User.find_one(User.username == token.username, fetch_links=True)
+    sys_manager = SysManagement(root=_env_values.ROOT_CLOUD_PATH , folder=user.folder)
+    size_dir = await sys_manager.get_directory()
+    return size_dir
+
+@app.get("/get_plan_size")
+async def get_dir(
+    token : Annotated[TokenData , Depends(auth_schema)] , 
+    session_db = Depends(start_session_db)
+) -> float:
+    user = await User.find_one(User.username == token.username, fetch_links=True)
+    sys_manager = SysManagement(root=_env_values.ROOT_CLOUD_PATH , folder=user.folder)
+    size_plan = await sys_manager.get_plan_size()
+    return size_plan
+
+
 @app.post("/dir")
 async def creating_a_dir(
         createdir : CreateDir,

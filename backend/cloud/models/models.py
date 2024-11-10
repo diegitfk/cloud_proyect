@@ -71,7 +71,7 @@ class NewAccount(BaseModel):
     plan_name : Literal['basic' , 'medium' , 'pro']
     limit_memory : int
     unity_memory : str
-    name : str  
+    name : str
     
 class EventCredentials(BaseModel):
     id : str
