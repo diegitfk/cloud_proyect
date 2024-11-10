@@ -159,6 +159,42 @@ class SysManagement:
             await self.__run_async_command(f"mv {str(current_resource_path)} {str(destiny_resource_path)}")
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error al mover el recurso: {str(e)}")
+    async def get_directory(self) -> float:
+        try:
+            result = await self.__run_async_command(f"du -sh {self.cloud_builder.current_path}")
+            size_str = result.decode().split()[0]
+
+            # Convierte el tamaño a gigabytes según el sufijo y redondea a 2 decimales en formato decimal
+            if size_str.endswith('G'):
+                return float(f"{round(float(size_str[:-1]), 2):.2f}")
+            elif size_str.endswith('M'):
+                return float(f"{round(float(size_str[:-1]) / 1024, 2):.2f}")
+            elif size_str.endswith('K'):
+                return float(f"{round(float(size_str[:-1]) / (1024 * 1024), 2):.2f}")
+            elif size_str.endswith('T'):
+                return float(f"{round(float(size_str[:-1]) * 1024, 2):.2f}")
+            else:
+                raise ValueError(f"Tamaño desconocido: {size_str}")
+
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=str(e))
+
+
+    async def get_plan_size(self) -> float:
+        try:
+            limt = self.folder.limit_capacity
+
+            if limt == 500:
+                limt = 0.5
+            elif limt == 1:
+                limt = 1.0
+            elif limt == 10:
+                limt = 10.0
+
+            return limt
+        
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=str(e))
 
     async def upload_files(self , files : List[UploadFile] , path_on_folder : Optional[Path] = None) -> Dict[str , Any]:
         copy_tasks = []
