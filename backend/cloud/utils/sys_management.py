@@ -33,9 +33,6 @@ class NotConstructBasePath(Exception):
     def __str__(self) -> str:
         return f"[Error]: {self.message}"
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-    
 class SysManagement:
     def __init__(self , root : str , folder : Folder) -> None:
         self.cloud_builder = (
@@ -133,6 +130,43 @@ class SysManagement:
             structure.current_items_on_path()
             newItem = structure.get_file_on_current_path(name_new_dir)
             return jsonable_encoder(newItem)
+    
+    async def get_directory(self) -> float:
+        try:
+            result = await self.__run_async_command(f"du -sh {self.cloud_builder.current_path}")
+            size_str = result.decode().split()[0]
+
+            # Convierte el tamaño a gigabytes según el sufijo y redondea a 2 decimales en formato decimal
+            if size_str.endswith('G'):
+                return float(f"{round(float(size_str[:-1]), 2):.2f}")
+            elif size_str.endswith('M'):
+                return float(f"{round(float(size_str[:-1]) / 1024, 2):.2f}")
+            elif size_str.endswith('K'):
+                return float(f"{round(float(size_str[:-1]) / (1024 * 1024), 2):.2f}")
+            elif size_str.endswith('T'):
+                return float(f"{round(float(size_str[:-1]) * 1024, 2):.2f}")
+            else:
+                raise ValueError(f"Tamaño desconocido: {size_str}")
+
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=str(e))
+
+
+    async def get_plan_size(self) -> float:
+        try:
+            limt = self.folder.limit_capacity
+
+            if limt == 500:
+                limt = 0.5
+            elif limt == 1:
+                limt = 1.0
+            elif limt == 10:
+                limt = 10.0
+
+            return limt
+        
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=str(e))
     
     async def mv_resource(self, path_on_folder: Path, destiny_resource_path: Path):
         if not path_on_folder or not destiny_resource_path:
