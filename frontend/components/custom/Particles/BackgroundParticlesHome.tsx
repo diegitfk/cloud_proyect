@@ -5,7 +5,7 @@ import { type Container, type ISourceOptions, MoveDirection, OutMode,} from "@ts
 import { loadSlim } from "@tsparticles/slim";
 import { useTheme } from "next-themes";
 
-const CoverParticles: React.FC = () => {
+const BackgroundParticlesHome: React.FC = () => {
   const { theme } = useTheme();
   const [init, setInit] = useState(false);
 
@@ -103,4 +103,4 @@ const CoverParticles: React.FC = () => {
   return null;
 };
 
-export default CoverParticles;
+export default BackgroundParticlesHome;

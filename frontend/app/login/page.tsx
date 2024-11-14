@@ -62,8 +62,8 @@ export default function PageLogin() {
 
   return (
     <>
-      <div className="flex items-center justify-center min-h-screen">
-        <Card className="w-full max-w-md shadow-lg py-5 animate-fade animate-once animate-duration-[600ms] animate-delay-[40ms] animate-ease-out animate-normal animate-fill-backwards">
+      <div className="flex items-center justify-center min-h-screen z-10">
+        <Card className="w-full max-w-md py-5 animate-fade animate-once animate-duration-[600ms] animate-delay-[40ms] animate-ease-out animate-normal animate-fill-backwards">
           <CardHeader className='animate-fade-down animate-once animate-duration-[200ms] animate-delay-[100ms] animate-ease-out animate-normal animate-fill-backwards'>
             <CardTitle className="text-2xl mx-auto">Iniciar Sesión</CardTitle>
             <CardDescription>Ingrese su correo electrónico y contraseña.</CardDescription>
