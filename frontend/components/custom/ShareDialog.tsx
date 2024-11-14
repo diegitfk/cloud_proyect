@@ -1,7 +1,6 @@
 "use client";
-
 import { useState } from "react";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { ChevronsUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -62,7 +61,7 @@ export function ShareDialog({ isOpen, onClose, itemName, itemPath }: ShareDialog
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Please select a user to share with",
+        description: "Por favor selecciona un usuario para compartir.",
       });
       return;
     }
@@ -87,19 +86,19 @@ export function ShareDialog({ isOpen, onClose, itemName, itemPath }: ShareDialog
         }),
       });
 
-      if (!response.ok) throw new Error("Failed to share");
+      if (!response.ok) throw new Error("Fallo al compartir el recurso");
 
       toast({
         title: "Success",
-        description: `Successfully shared ${itemName} with ${selectedUser}`,
+        description: `El recurso ${resourceName} ha sido compartido con ${selectedUser}.`,
       });
       onClose();
     } catch (error) {
-      console.error("Share error:", error);
+      console.error("Error compartiendo el recurso:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to share the item. Please try again.",
+        description: "Error al compartir el recurso. Por favor, inténtalo de nuevo.",
       });
     }
   };
@@ -110,9 +109,9 @@ export function ShareDialog({ isOpen, onClose, itemName, itemPath }: ShareDialog
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Share {itemName}</DialogTitle>
+          <DialogTitle>Compartir {itemName}</DialogTitle>
           <DialogDescription>
-            Select a user to share this item with. They will receive access immediately.
+            Seleccione un usuario con quien compartir este elemento. Recibirán acceso inmediatamente.
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-4 py-4">
@@ -130,7 +129,7 @@ export function ShareDialog({ isOpen, onClose, itemName, itemPath }: ShareDialog
             <PopoverContent className="w-full p-0">
               <div className="max-h-60 overflow-y-auto">
                 {users.length === 0 ? (
-                  <div className="p-2 text-gray-500">No users found.</div>
+                  <div className="p-2 text-gray-500">No se encontraron usuarios.</div>
                 ) : (
                   users.map((user) => (
                     <div
@@ -151,10 +150,10 @@ export function ShareDialog({ isOpen, onClose, itemName, itemPath }: ShareDialog
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
-            Cancel
+            Cancelar
           </Button>
           <Button onClick={handleShare} disabled={!selectedUser}>
-            Share
+            Compartir
           </Button>
         </DialogFooter>
       </DialogContent>

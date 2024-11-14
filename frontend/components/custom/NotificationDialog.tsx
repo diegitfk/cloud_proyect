@@ -103,7 +103,7 @@ export function NotificationDialog({
           )}
         </ScrollArea>
         <div className="flex justify-end mt-4">
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>
+          <Button variant="ghost" className='text-red-500 hover:bg-red-500 hover:text-white' onClick={() => onOpenChange(false)}>
             Cerrar
           </Button>
         </div>

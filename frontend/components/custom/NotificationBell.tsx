@@ -1,5 +1,4 @@
 'use client';
-
 import { Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -52,7 +51,7 @@ interface NotificationBellProps {
                 onClick={onClearAll}
                 className="text-xs"
               >
-                Clear all
+                Limpiar todos
               </Button>
             )}
           </div>
@@ -88,7 +87,7 @@ interface NotificationBellProps {
                             className="text-xs h-7"
                             onClick={() => onMarkAsRead(notification.id)}
                           >
-                            Marcar como leido
+                            Marcar como leído
                           </Button>
                         )}
                         <Button
@@ -97,7 +96,7 @@ interface NotificationBellProps {
                           className="text-xs h-7"
                           onClick={() => onRemove(notification.id)}
                         >
-                          eliminar
+                          Eliminar
                         </Button>
                       </div>
                     </div>
@@ -109,9 +108,10 @@ interface NotificationBellProps {
           <Button 
           variant='ghost'
           size="sm"
-          className='w-full flex justify-center mt-4'
-          onClick={() => setDialogOpen(true)}
-          >Administrar solicitudes de transferencia</Button>
+          className='w-full flex justify-center mt-4 text-white hover:bg-green-600'
+          onClick={() => setDialogOpen(true)}>
+            Administrar solicitudes de transferencia
+          </Button>
         </DropdownMenuContent>
       </DropdownMenu>
       <NotificationDialog

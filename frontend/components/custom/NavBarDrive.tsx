@@ -4,15 +4,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import LogoCloudingDrive from "@/public/icons/cloudicon.svg";
-import { SearchIcon, BellIcon } from 'lucide-react';
 import { ModeToggle } from '@/components/ui/button_mode';
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { NotificationBell } from '@/components/custom/NotificationBell';
 import { Notification, useWebSocket } from '@/hooks/useWebSocket';
 import { Toaster } from 'sonner';
-import { NotificationDialog } from './NotificationDialog';
-import { read } from 'fs';
 
 export default function NavBarDrive() {
   //Se ajustan aqui callbacks del NotificationBell
@@ -54,10 +51,6 @@ export default function NavBarDrive() {
         </div>
         <div className='flex items-center gap-4'>
           <ModeToggle />
-          <Button variant="ghost" size="icon" className="rounded-full">
-            <SearchIcon className="h-5 w-5" />
-            <span className="sr-only">Buscar</span>
-          </Button>
           <NotificationBell
             notifications={notifications}
             onClearAll={handleClearAll}
@@ -82,7 +75,6 @@ export default function NavBarDrive() {
               <DropdownMenuSeparator />
               <DropdownMenuItem>Tu drive</DropdownMenuItem>
               <DropdownMenuItem>Compartido conmigo</DropdownMenuItem>
-              <DropdownMenuItem>Favoritos</DropdownMenuItem>
               <DropdownMenuItem>Papelera</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem>Configuraciones</DropdownMenuItem>

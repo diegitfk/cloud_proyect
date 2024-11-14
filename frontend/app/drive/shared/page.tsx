@@ -26,11 +26,11 @@ export default function Home() {
       const data = await response.json();
       setFiles(data);
     } catch (error) {
-      console.error('Failed to fetch files:', error);
+      console.error('Fallo al obtener los recursos:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to fetch files. Please try again later.",
+        description: "Fallo al obtener los recursos. Por favor, inténtalo de nuevo.",
       });
     } finally {
       setLoading(false);
@@ -42,7 +42,7 @@ export default function Home() {
       const response = await fetch(`/api/download_resource?namefile=${encodeURIComponent(fileName)}`);
       
       if (!response.ok) {
-        throw new Error('Download failed');
+        throw new Error('Fallo al descargar el archivo');
       }
 
       const blob = await response.blob();
@@ -57,21 +57,21 @@ export default function Home() {
 
       toast({
         title: "Success",
-        description: "File download started successfully",
+        description: "El archivo se ha descargado correctamente.",
       });
     } catch (error) {
-      console.error('Download failed:', error);
+      console.error('Descarga fallida:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to download file. Please try again later.",
+        description: "Fallo al descargar el archivo. Por favor, inténtalo de nuevo.",
       });
     }
   };
 
   return (
     <div className="container mx-auto py-10">
-      <h1 className="text-3xl font-bold mb-8">File Explorer</h1>
+      <h1 className="text-3xl font-bold mb-8">Compartido Conmigo</h1>
       <FileTable 
         files={files}
         loading={loading}

@@ -42,23 +42,23 @@ export function FileTable({ files, loading, onDownload }: FileTableProps) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[300px]">Name</TableHead>
-            <TableHead>Size</TableHead>
-            <TableHead>Created At</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead className="w-[300px]">Nombre</TableHead>
+            <TableHead>Tamaño</TableHead>
+            <TableHead>Fecha de envío</TableHead>
+            <TableHead className="text-right">Acciones</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {loading ? (
             <TableRow>
               <TableCell colSpan={4} className="text-center py-10">
-                Loading files...
+                Cargando archivos...
               </TableCell>
             </TableRow>
           ) : files.length === 0 ? (
             <TableRow>
               <TableCell colSpan={4} className="text-center py-10">
-                No files found
+                No hay elementos para mostrar.
               </TableCell>
             </TableRow>
           ) : (
@@ -83,7 +83,7 @@ export function FileTable({ files, loading, onDownload }: FileTableProps) {
                     className="text-blue-500 hover:text-blue-700 hover:bg-blue-50"
                     onClick={() => onDownload(file.name)}
                   >
-                    Download
+                    Descargar
                   </Button>
                 </TableCell>
               </TableRow>
