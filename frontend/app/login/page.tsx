@@ -6,11 +6,13 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import LoadingButton from "@/components/custom/ButtonLoading"
 import Link from 'next/link';
+import { Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export default function PageLogin() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [mostrarContraseña, setMostrarContraseña] = useState(false);
   const [isLoading, setIsLoading] = useState(false)
   const [isRedirecting, setIsRedirecting] = useState(false)
   const [error, setError] = useState('')
@@ -84,15 +86,26 @@ export default function PageLogin() {
               </div>
               <div className="grid gap-2 animate-fade-left animate-once animate-duration-[80ms] animate-delay-[400ms] animate-ease-out animate-normal animate-fill-backwards">
                 <Label htmlFor="password">Contraseña</Label>
-                <Input
-                  required
-                  id="password"
-                  type="password"
-                  placeholder='********'
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={isButtonLoading}
-                />
+                <div className='relative'>
+                  <Input
+                    required
+                    id="password"
+                    type={mostrarContraseña ? "text" : "password"}
+                    placeholder='********'
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={isButtonLoading}
+                  />
+                  <div
+                    className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
+                    onClick={() => setMostrarContraseña(!mostrarContraseña)}
+                  >
+                    {mostrarContraseña ?
+                      <Eye className="text-white" /> :
+                      <EyeOff className="text-white" />
+                    }
+                  </div>
+                </div>
                 <Link href="#" className="ml-auto inline-block text-sm underline animate-fade-left animate-once animate-duration-[80ms] animate-delay-[600ms] animate-ease-out animate-normal animate-fill-backwards " prefetch={false}>
                   ¿Olvidaste tu contraseña?
                 </Link>
@@ -102,10 +115,10 @@ export default function PageLogin() {
             <CardFooter className='flex-col animate-fade-up animate-once animate-duration-[100ms] animate-delay-[800ms] animate-ease-out animate-normal animate-fill-backwards'>
               <LoadingButton
                 isLoading={isLoading}
-                isRedirecting={isRedirecting} 
+                isRedirecting={isRedirecting}
                 disabled={isButtonLoading}
-                >
-                  Iniciar Sesión
+              >
+                Iniciar Sesión
               </LoadingButton>
               <div className="mt-4 text-center text-sm">
                 ¿No tienes una cuenta?{" "}
