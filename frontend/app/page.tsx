@@ -10,7 +10,7 @@ export default function PageHome() {
     <div className="flex min-h-screen flex-col">
       <NavBarLayout />
       <main className="flex-1">
-        <section className="relative w-full py-12 md:py-20 lg:py-22">
+        <section className="relative w-full px-5 py-12 md:py-20 lg:py-22">
           <BackgroundParticlesHome />
           <div className="container grid gap-12 px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
@@ -71,7 +71,7 @@ export default function PageHome() {
             </div>
           </div>
         </section>
-        <section className="w-full px-20 py-5 mb-5 min-h-screen select-none">
+        <section className="w-full px-10 py-5 mb-5 min-h-screen select-none">
           <div className="flex flex-col items-center justify-center space-y-4 text-center py-5 mb-8">
             <div className="space-y-2">
               <h2 className="text-3xl font-bold tracking-wide sm:text-5xl">Nuestros planes de suscripción</h2>
