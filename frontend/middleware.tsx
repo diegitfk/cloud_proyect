@@ -16,5 +16,5 @@ export function middleware(request: NextRequest){
 
 // RUTAS DEFINIDAS, SERAN LAS RUTAS QUE TENDRAN RESTRICCIONES O SERAN PROTEGIDAS
 export const config = {
-    matcher: ['/drive/:path*'], // APLICAR RESTRICCION DESDE /drive Y TODAS SUS SUBRUTAS
+    matcher: ['/drive/:path*', ] // APLICAR RESTRICCION DESDE /drive Y TODAS SUS SUBRUTAS
 }
