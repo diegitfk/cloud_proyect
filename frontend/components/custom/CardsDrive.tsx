@@ -40,18 +40,19 @@ const fetcher = async (url: string, path: string): Promise<DriveItem[]> => {
   return data.tree;
 };
 
-const CardsDrive = () => {
+const CardsDrive = ({onTrash} : {onTrash : boolean}) => {
   const { getCurrentPath, setPath } = useDriveState();
   const router = useRouter();
   const pathname = usePathname();
   const currentPath = getCurrentPath(); // Usamos getCurrentPath para obtener el path normalizado
-  const { data, error, isLoading } = useSWR(['/api/tree', currentPath], ([url, path]) => fetcher(url, path), {
+  let urlFetching = onTrash ? '/api/trash' :  '/api/tree'
+  const { data, error, isLoading } = useSWR([urlFetching, currentPath], ([url, path]) => fetcher(url, path), {
     refreshInterval: 10000, // Refresca cada 10 segundos
     revalidateOnFocus: true,
   });
 
   useEffect(() => {
-    const pathFromUrl = pathname.replace('/drive', '').replace(/^\/+|\/+$/g, '');
+    const pathFromUrl = onTrash ? pathname.replace('/drive/trash', '').replace(/^\/+|\/+$/g, '') : pathname.replace('/drive', '').replace(/^\/+|\/+$/g, '');
     setPath(pathFromUrl);
   }, [pathname, setPath]);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
@@ -59,7 +60,8 @@ const CardsDrive = () => {
 
 
   const handleFolderClick = (folderPath: string) => {
-    router.push(`/drive/${folderPath}`);
+    let pathPush = onTrash ? `/drive/trash/${folderPath}` : `drive/${folderPath}`
+    router.push(pathPush);
   };
   const handleShareClick = (event: React.MouseEvent, item: DriveItem) => {
     event.stopPropagation();
