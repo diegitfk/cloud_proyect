@@ -99,6 +99,18 @@ class SysManagement:
         tree_structure = StructureCurrentPath(current_path=base_path)
         tree_structure.current_items_on_path()
         return jsonable_encoder(tree_structure.current_items)
+    
+    def get_subdirs(self) -> List[str]:
+        subdirs = []
+        base_path = str(self.cloud_builder.current_path)
+        for current_path, dirs, archivos in os.walk(base_path):
+            if current_path.startswith(base_path):
+                for directorio in dirs:
+                    if not directorio.startswith('.'):
+                        subdir_path = os.path.join(current_path, directorio)
+                        subdirs.append(os.path.relpath(subdir_path, base_path))
+        subdirs.append('')
+        return subdirs
 
     async def create_dir(self , name_new_dir : str , path_on_folder : Optional[str] = None):
         """
@@ -121,6 +133,32 @@ class SysManagement:
             structure.current_items_on_path()
             newItem = structure.get_file_on_current_path(name_new_dir)
             return jsonable_encoder(newItem)
+    
+    async def mv_resource(self, path_on_folder: Path, destiny_resource_path: Path):
+        if not path_on_folder or not destiny_resource_path:
+            raise HTTPException(status_code=400, detail="Falta información para mover el recurso")
+
+        root_path = self.cloud_builder.current_path
+        current_resource_path = root_path / path_on_folder
+        destiny_resource_path = root_path / destiny_resource_path
+
+        if not current_resource_path.exists():
+            raise HTTPException(status_code=404, detail=f"El recurso {current_resource_path} no existe")
+        
+        if current_resource_path == destiny_resource_path:
+            raise HTTPException(status_code=400, detail="La ruta de destino es la misma que la de origen")
+
+        if not str(current_resource_path).startswith(str(root_path)) or not str(destiny_resource_path).startswith(str(root_path)):
+            raise HTTPException(status_code=400, detail="No se puede mover el recurso fuera del directorio raíz")
+
+        if destiny_resource_path.exists() and destiny_resource_path.is_dir():
+            destiny_resource_path = destiny_resource_path / current_resource_path.name
+        
+        try:
+            # Ejecutar el comando de mover el recurso
+            await self.__run_async_command(f"mv {str(current_resource_path)} {str(destiny_resource_path)}")
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error al mover el recurso: {str(e)}")
 
     async def upload_files(self , files : List[UploadFile] , path_on_folder : Optional[Path] = None) -> Dict[str , Any]:
         copy_tasks = []
