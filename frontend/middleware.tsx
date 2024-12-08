@@ -1,20 +1,22 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest){
-    // OBTENIENDO LA COOKIE DEL INICIO DE SESION
-    const token = request.cookies.get('session_jwt')?.value;
+export function middleware(request: NextRequest) {
+  const token = request.cookies.get('session_jwt');
 
-    // EN CASO DE NO EXISTIR TOKEN, ESTE REDIRIGIRA A login/ 
-    if(!token){
-        return NextResponse.redirect(new URL('/login', request.url));
+  // Verifica si la ruta coincide con /drive o sus subrutas
+  if (request.nextUrl.pathname.startsWith('/drive')) {
+    if (!token) {
+      const loginUrl = new URL('/login', request.url);
+      return NextResponse.redirect(loginUrl);
     }
+  }
 
-    // SI NO SE CUMPLE LA CONDICION, SEGUIRA LA A LA REDIRECCION DE LAS RUTAS DEFINIDAS
-    return NextResponse.next();
+  // Si el token existe, permite el acceso
+  return NextResponse.next();
 }
 
-// RUTAS DEFINIDAS, SERAN LAS RUTAS QUE TENDRAN RESTRICCIONES O SERAN PROTEGIDAS
+// Configuración de las rutas en las que se aplica el middleware
 export const config = {
-    matcher: ['/drive/:path*', ] // APLICAR RESTRICCION DESDE /drive Y TODAS SUS SUBRUTAS
-}
+  matcher: ['/drive/:path*'], // Aplica a /drive y cualquier subdirectorio
+};
