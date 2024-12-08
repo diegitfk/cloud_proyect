@@ -91,6 +91,13 @@ class SysManagement:
         tree_structure.current_items_on_path()
         return jsonable_encoder(tree_structure.current_items)
 
+    def src_download(self , name_file : str) -> Path:
+        base = self.cloud_builder.current_path
+        down = base / Path(name_file)
+        if not down.exists():
+            raise Exception("Not exist this file")
+        return down
+            
     async def create_dir(self , name_new_dir : str , path_on_folder : Optional[str] = None):
         """
             Este metodo cumple el proposito de crear carpetas en el nivel base o anidado del folder asignado 
