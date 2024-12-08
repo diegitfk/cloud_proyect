@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Form, UploadFile, Path, Query , Body,  Request , status , Response , Depends
+from fastapi import FastAPI, Form, UploadFile, Path, Query , Body,  Request , status , Response , Depends, HTTPException
 from fastapi.responses import FileResponse, JSONResponse
 from pathlib import Path as PathSys
 from routers.webhooks import webhook_router, start_session_db
@@ -11,6 +11,7 @@ from jwt import DecodeError , ExpiredSignatureError
 from utils.security import JwtFlow , TokenData
 from typing import Annotated, Optional
 import shutil
+import os
 """
     ### Finalidad de este archivo
     Contiene todos los controladores y puntos finales de la api, para el login, 
@@ -171,3 +172,73 @@ async def delete_file_tree(
     sys_manager = SysManagement(root=_env_values.ROOT_CLOUD_PATH , folder=user.folder)
     operation = sys_manager.delete_file(filename=filename , path_folder=path.path_on_folder)
     return {"Response" : operation.model_dump()}
+
+@app.get("/download_file/")
+async def download_file(
+    name: Annotated[str, Query(...)],
+    token: Annotated[TokenData, Depends(auth_schema)], 
+    session_db = Depends(start_session_db)
+):
+    # Limpia el nombre eliminando cualquier '/' inicial o codificado
+    clean_name = name.lstrip('/').lstrip('%2F')
+    
+    user = await User.find_one(User.username == token.username, fetch_links=True)
+    sys_manager = SysManagement(root=_env_values.ROOT_CLOUD_PATH, folder=user.folder)
+    file_download = sys_manager.src_download(clean_name)
+    
+    return FileResponse(
+        path=file_download,
+        headers={"Content-Disposition": f"attachment; filename={file_download.name}"},
+        media_type="application/octet-stream", 
+        filename=file_download.name
+    )
+
+@app.get("/download_folder/")
+async def download_folder(
+    name: Annotated[str, Query(...)],
+    token: Annotated[TokenData, Depends(auth_schema)], 
+    session_db = Depends(start_session_db)
+):
+    # Limpia el nombre eliminando cualquier '/' inicial o codificado
+    clean_name = name.lstrip('/').lstrip('%2F')
+    
+    user = await User.find_one(User.username == token.username, fetch_links=True)
+    sys_manager = SysManagement(root=_env_values.ROOT_CLOUD_PATH, folder=user.folder)
+    
+    # Obtener la ruta completa del directorio
+    folder_path = sys_manager.src_download(clean_name)
+    
+    # Verificar si es un directorio
+    if not os.path.isdir(folder_path):
+        raise HTTPException(status_code=400, detail="The specified path is not a directory")
+    
+    # Crear un nombre de archivo ZIP
+    zip_filename = f"{os.path.basename(folder_path)}.zip"
+    zip_path = os.path.join(os.path.dirname(folder_path), zip_filename)
+    
+    try:
+        # Crear el archivo ZIP
+        shutil.make_archive(
+            os.path.splitext(zip_path)[0],  # Quitar la extensión .zip
+            'zip',
+            folder_path
+        )
+        
+        # Devolver el archivo ZIP
+        return FileResponse(
+            path=zip_path,
+            headers={
+                "Content-Disposition": f"attachment; filename={zip_filename}",
+                "Content-Type": "application/zip"
+            },
+            media_type="application/zip",
+            filename=zip_filename
+        )
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating ZIP file: {str(e)}")
+    finally:
+        # Opcional: limpiar el archivo ZIP después de la descarga
+        # Dependiendo de tus requisitos, podrías querer mantener o eliminar el archivo ZIP
+        if os.path.exists(zip_path):
+            os.remove(zip_path)
