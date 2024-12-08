@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import useSWR from 'swr';
@@ -7,8 +6,8 @@ import { Spinner } from "@/components/ui/spinner";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import FileIcon from "@/public/icons/fileicon.svg";
 import FolderIcon from "@/public/icons/foldericon.svg";
+import FileIcon from "@/public/icons/fileicon.svg";
 import { Ellipsis } from "lucide-react";
 import { ShareDialog } from './ShareDialog';
 import useDriveState from '@/states/useDriveState'
@@ -25,6 +24,7 @@ export type DriveItem = {
   path: string; // Ruta del elemento
 };
 
+// Fetcher function for getting drive items
 // Fetcher function for getting drive items
 const fetcher = async (url: string, path: string): Promise<DriveItem[]> => {
   const response = await fetch(url, {
@@ -69,6 +69,7 @@ const CardsDrive = ({ onTrash }: { onTrash: boolean }) => {
     const pathFromUrl = onTrash ? pathname.replace('/drive/trash', '').replace(/^\/+|\/+$/g, '') : pathname.replace('/drive', '').replace(/^\/+|\/+$/g, '');
     setPath(pathFromUrl);
   }, [pathname, setPath]);
+
 
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   //Estados Asociados a mover recursos
@@ -151,17 +152,11 @@ const CardsDrive = ({ onTrash }: { onTrash: boolean }) => {
     }
   }
 
-  // Usage example
-  const handleDownload = () => {
-    downloadFile('example.txt');
-  };
-
-
-
   const handleFolderClick = (folderPath: string) => {
     let pathPush = onTrash ? `/drive/trash/${folderPath}` : `/drive/${folderPath}`
     router.push(pathPush);
   };
+
 
   const handleShareClick = (event: React.MouseEvent, item: DriveItem) => {
     event.stopPropagation();
@@ -243,8 +238,7 @@ const CardsDrive = ({ onTrash }: { onTrash: boolean }) => {
         </div>
       ) : (
         items.map((element: DriveItem, index: number) => (
-          <Card
-            key={element.id || index}
+          <Card key={element.id || index}
             className="flex flex-col justify-center group shadow-md w-full min-h-[180px] cursor-pointer transition-transform duration-200 ease-in-out transform active:scale-100 hover:scale-95"
             onClick={() => element.type === 'folder' ? handleFolderClick(element.path) : null}
           >
@@ -283,11 +277,9 @@ const CardsDrive = ({ onTrash }: { onTrash: boolean }) => {
                         Descargar carpeta
                       </DropdownMenuItem>
                     )}
-                    <DropdownMenuItem>Mover a</DropdownMenuItem>
-                    <DropdownMenuItem className='text-red-500'>Eliminar</DropdownMenuItem>
-                  </DropdownMenuContent >
-                </DropdownMenu >
-              </div >
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
               <div className='flex items-center justify-center gap-2 grow'>
                 {element.type === 'file' ? (
                   <FileIcon className="h-6 w-6" />
@@ -295,29 +287,27 @@ const CardsDrive = ({ onTrash }: { onTrash: boolean }) => {
                   <FolderIcon className="h-6 w-6" />
                 )}
               </div>
-            </CardHeader >
+            </CardHeader>
             <CardContent className="flex flex-col items-center justify-center gap-2 p-4">
               <div className="flex items-center justify-center gap-2 grow">
                 <div className="flex flex-row p-2 text-lg font-medium select-none">{element.name}</div>
               </div>
               <div className="text-sm text-muted-foreground select-none">{new Date(element.created_at).toLocaleDateString()}</div>
             </CardContent>
-          </Card >
+          </Card>
         ))
       )}
-      {
-        selectedItem && (
-          <ShareDialog
-            isOpen={shareDialogOpen}
-            onClose={() => {
-              setShareDialogOpen(false);
-              setSelectedItem(null);
-            }}
-            itemName={selectedItem.name}
-            itemPath={selectedItem.path}
-          />
-        )
-      }
+      {selectedItem && (
+        <ShareDialog
+          isOpen={shareDialogOpen}
+          onClose={() => {
+            setShareDialogOpen(false);
+            setSelectedItem(null);
+          }}
+          itemName={selectedItem.name}
+          itemPath={selectedItem.path}
+        />
+      )}
       {
         selectedItem && (
           <MoveDialog
@@ -331,6 +321,6 @@ const CardsDrive = ({ onTrash }: { onTrash: boolean }) => {
       }
     </>
   );
-};
+}
 
 export default CardsDrive;
