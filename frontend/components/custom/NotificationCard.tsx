@@ -38,7 +38,7 @@ export function NotificationCard({
               className="text-xs h-7"
               onClick={() => onMarkAsRead(notification.id)}
             >
-              Marcar como leido
+              Marcar como leído
             </Button>
           )}
           {onRemove && (
@@ -48,7 +48,7 @@ export function NotificationCard({
               className="text-xs h-7"
               onClick={() => onRemove(notification.id)}
             >
-              eliminar
+              Eliminar
             </Button>
           )}
         </div>

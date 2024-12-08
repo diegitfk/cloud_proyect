@@ -23,7 +23,7 @@ export default function SideBar({ setActiveView }: SideBarProps) {
       {/* Encabezado del Sidebar */}
       <SidebarHeader className="mt-4">
         <DrawerElement>
-          <Button variant="outline" className="w-full hover:bg-[#59B47D] hover:text-white">
+          <Button variant="outline" className="w-full hover:bg-green-600 hover:text-white">
             <PlusIcon className="mr-2 h-4 w-4" />
             Nuevo
           </Button>

@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import NavBarLayout from "@/components/custom/NavBarLayout"
 import { BriefcaseIcon, DatabaseIcon, HeadphonesIcon, PieChartIcon, RocketIcon, TabletsIcon } from "lucide-react"
 import PlanPricing from "@/components/custom/PlanPricing"
-import CoverParticles from "@/components/custom/BackgroundParticles"
+import BackgroundParticlesHome from "@/components/custom/Particles/BackgroundParticlesHome"
 
 export default function PageHome() {
   return (
@@ -11,7 +11,7 @@ export default function PageHome() {
       <NavBarLayout />
       <main className="flex-1">
         <section className="relative w-full py-12 md:py-20 lg:py-22">
-          <CoverParticles />
+          <BackgroundParticlesHome />
           <div className="container grid gap-12 px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2 select-none">

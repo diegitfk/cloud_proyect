@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 export async function DELETE(request : NextRequest) {
+    //Se debe recibir un json como el siguiente {path_on_folder : [PATH]}
     try{
         const cookieStore = cookies();
         const sessionCookie = (await cookieStore).get("session_jwt");
@@ -9,7 +10,7 @@ export async function DELETE(request : NextRequest) {
 
         
         const fastapiResponse = await fetch(
-            `http://localhost:8000/cloud/dir`,
+            `http://localhost:8000/cloud/folder`,
             {
                 method : 'DELETE',
                 credentials : 'include',

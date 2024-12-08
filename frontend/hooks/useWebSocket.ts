@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useEffect, useRef, useState} from 'react';
+import { useEffect, useRef, useState} from 'react';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -31,18 +31,18 @@ export const useWebSocket = (url: string , onNotification? : (notification: Noti
         });
 
         if (!response.ok) {
-          throw new Error('Failed to process transfer');
+          throw new Error('Proceso de transferencia fallido');
         }
   
         const result = await response.json();
-        toast.success('Transfer processed successfully', {
+        toast.success('Transferencia procesada exitosamente', {
           description: result.message,
         });
 
     }catch (error){
-      console.error('Error processing transfer:', error);
-      toast.error('Transfer processing failed', {
-        description: 'Could not complete the transfer process',
+      console.error('Error de transferencia:', error);
+      toast.error('Proceso de transferencia fallido', {
+        description: 'No se pudo completar el proceso de transferencia',
       });
     }
   }
@@ -85,7 +85,7 @@ export const useWebSocket = (url: string , onNotification? : (notification: Noti
         setIsConnected(true);
         reconnectAttempts.current = 0;
         if (!isConnected) {
-          toast.success('Connected to notification service');
+          toast.success('Servicio de notificaciones activado');
         }
       };
 
@@ -109,7 +109,7 @@ export const useWebSocket = (url: string , onNotification? : (notification: Noti
           showToastByEventType(notification);
           onNotification?.(notification);
         } catch (error) {
-          console.error('Error parsing notification:', error);
+          console.error('Error mensaje recibido:', error);
         }
       };
 
@@ -126,13 +126,13 @@ export const useWebSocket = (url: string , onNotification? : (notification: Noti
             connect();
           }, timeoutDuration);
         } else {
-          toast.error('Connection failed', {
-            description: 'Unable to establish a stable connection to the notification service',
+          toast.error('Conexión fallida', {
+            description: 'Incapaz de conectarse con el servicio de notificaciones',
           });
         }
       };
     } catch (error) {
-      console.error('Connection error:', error);
+      console.error('Error de conexión:', error);
       setIsConnected(false);
     }
   };
