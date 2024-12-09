@@ -1,4 +1,3 @@
-'use client';
 import React, { useState } from 'react';
 import { FilePond, registerPlugin } from 'react-filepond';
 import { FilePondFile } from 'filepond';
@@ -12,53 +11,58 @@ registerPlugin(FilePondPluginImagePreview);
 interface FileUploadProps {
   allowMultiple?: boolean;
   maxFiles?: number;
-  server?: string;
+  server?: string; // Esta es la ruta a tu API de Next.js
+  currentPath?: string; // Ruta en la que se encuentra el usuario
 }
 
-
-const FileUpload: React.FC<FileUploadProps> = ({ allowMultiple = true, maxFiles = 3, server = '/api/upload' }) => {
+const FileUpload: React.FC<FileUploadProps> = ({ 
+  allowMultiple = true, 
+  maxFiles = 3, 
+  server = '/api/upload', // Cambiar a la ruta de tu API
+  currentPath 
+}) => {
   const [files, setFiles] = useState<File[]>([]);
 
   return (
     <div className="w-full rounded-lg border-2 border-dashed">
       <style>
         {`
-      .filepond--file-action-button {
-        cursor: pointer;
-      }
-      .filepond--root {
-        border-radius: 0.5rem;
-        margin: 0;
-      }
-      .filepond--drop-label {
-        color: #9ca3af;
-      }
-      .filepond--panel-root {
-        background-color: #18181B;
-        width: 100%;
-      }
-      .filepond--item-panel {
-        background-color: #555;
-      }
-      .filepond--label-action {
-        text-decoration-color: #16a34a;
-        color: #16a34a;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .filepond--wrapper {
-        width: 100%;
-        height: auto;
-      }
-      .container-svg {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 100%;
-      }
-    `}
+          .filepond--file-action-button {
+            cursor: pointer;
+          }
+          .filepond--root {
+            border-radius: 0.5rem;
+            margin: 0;
+          }
+          .filepond--drop-label {
+            color: #9ca3af;
+          }
+          .filepond--panel-root {
+            background-color: #18181B;
+            width: 100%;
+          }
+          .filepond--item-panel {
+            background-color: #555;
+          }
+          .filepond--label-action {
+            text-decoration-color: #16a34a;
+            color: #16a34a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          .filepond--wrapper {
+            width: 100%;
+            height: auto;
+          }
+          .container-svg {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+          }
+        `}
       </style>
       <FilePond
         files={files}
@@ -67,7 +71,37 @@ const FileUpload: React.FC<FileUploadProps> = ({ allowMultiple = true, maxFiles 
         }}
         allowMultiple={allowMultiple}
         maxFiles={maxFiles}
-        server={server}
+        server={{
+          process: (fieldName, file, metadata, load, error) => {
+            // Crea un nuevo FormData para incluir el currentPath
+            const formData = new FormData();
+            formData.append('files', file);
+            if (currentPath) {
+              formData.append('path', currentPath);
+            }
+
+            // Realiza el fetch al endpoint de tu API de Next.js
+            fetch(server, {
+              method: 'POST',
+              body: formData,
+            })
+              .then(response => {
+                if (response.ok) {
+                  return response.json();
+                }
+                throw new Error('Carga fallida');
+              })
+              .then(data => {
+                load(data); // Llama a load con los datos recibidos
+              })
+              .catch(err => {
+                error(err.message); // Llama a error en caso de fallo
+              });
+          },
+          revert: (uniqueFileId, load, error) => {
+            // Aquí puedes implementar la lógica para revertir la carga si es necesario
+          },
+        }}
         className="filepond-input"
         labelIdle={`
           <div class='container-svg'>

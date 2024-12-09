@@ -11,27 +11,42 @@ type DriveItem = {
 type DriveState = {
   items: DriveItem[];
   newFolderName: string;
-  currentView: string;
+  path: string;
   setNewFolderName: (name: string) => void;
   addItem: (item: DriveItem) => void;
-  setCurrentView: (view: string) => void;
+  setPath: (path: string) => void;
   handleCreateFolder: () => void;
+  navigateToFolder: (folderName: string) => void;
+  getCurrentPath: () => string;
 };
 
-const initialItems: DriveItem[] = [
-  { id: "1", name: "Documentos", type: "folder", createdAt: "02/09/2024", icon: "/icons/foldericon.svg" },
-  { id: "2", name: "Imágenes", type: "folder", createdAt: "03/09/2024", icon: "/icons/foldericon.svg" },
-  { id: "3", name: "Música", type: "folder", createdAt: "03/09/2024", icon: "/icons/foldericon.svg" },
-  { id: "4", name: "Videos", type: "folder", createdAt: "03/09/2024", icon: "/icons/foldericon.svg" }
-];
-
-const useDriveState = create<DriveState>((set) => ({
-  items: initialItems,
+const useDriveState = create<DriveState>((set, get) => ({
+  items: [],
   newFolderName: '',
-  currentView: 'folders',
+  path: '',
+  
+  // Función para obtener el path actual normalizado
+  getCurrentPath: () => {
+    const state = get();
+    if (!state.path) return '';
+    return state.path.startsWith('/') ? state.path : `/${state.path}`;
+  },
+
+  setPath: (newPath) => set({ 
+    path: newPath === '/' ? '' : newPath 
+  }),
+
+  navigateToFolder: (folderName) =>
+    set((state) => ({
+      path: !state.path ? folderName : `${state.path}/${folderName}`
+    })),
+
   setNewFolderName: (name) => set({ newFolderName: name }),
-  addItem: (item) => set((state) => ({ items: [...state.items, item] })),
-  setCurrentView: (view) => set({ currentView: view }),
+
+  addItem: (item) => set((state) => ({ 
+    items: [...state.items, item] 
+  })),
+
   handleCreateFolder: () => set((state) => {
     if (state.newFolderName.trim() !== "") {
       const newFolder: DriveItem = {
@@ -41,7 +56,10 @@ const useDriveState = create<DriveState>((set) => ({
         createdAt: new Date().toLocaleDateString(),
         icon: "/icons/foldericon.svg"
       };
-      return { items: [...state.items, newFolder], newFolderName: '' };
+      return { 
+        items: [...state.items, newFolder], 
+        newFolderName: '' 
+      };
     }
     return state;
   })

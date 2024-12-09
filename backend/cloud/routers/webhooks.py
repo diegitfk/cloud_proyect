@@ -70,7 +70,7 @@ async def config_new_account(new_account : NewAccount , transaction_credentials 
     #Creamos la carpeta en el sistema
     #Todo: Se debe limitar el espacio de la carpeta creada acorde a el plan seleccionado por el usuario
     proc_root = await asyncio.create_subprocess_shell(
-        cmd=f"mkdir {_env_values.ROOT_CLOUD_PATH}/{str(new_root_folder.folder_name)}",
+        cmd=f"mkdir -p {_env_values.ROOT_CLOUD_PATH}/{str(new_root_folder.folder_name)}/.trash",
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE
     )

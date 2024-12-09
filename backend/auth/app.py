@@ -119,7 +119,7 @@ async def login_on_sys(user_login : UserLogin, start_session_db = Depends(start_
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST , detail={"reason" : "The password is not correct" , "password" : user_login.password})
     payload_token = TokenData(username=user_in_db.username , name=user_in_db.nombre , last_name=user_in_db.apellido)
     token = JwtFlow.generate_token(payload=payload_token , expire_token_on=timedelta(minutes=20))
-    response = JSONResponse(content={"message" : "Welcome to APP"})
+    response = JSONResponse(content={"message": "Inicio de sesión exitoso", "username": user_in_db.username})
     response.set_cookie(
         key="session_jwt" , 
         value=token.access_token,

@@ -4,8 +4,7 @@ import Link from 'next/link';
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
-import { Loader2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import LoadingButton from "@/components/custom/ButtonLoading"
 import LogoCloudingDrive from "@/public/icons/cloudicon.svg";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
@@ -21,6 +20,7 @@ type FormData = z.infer<typeof formSchema>;
 export default function PageRegister() {
   const [mostrarContraseña, setMostrarContraseña] = useState(false);
   const [isLoading, setIsLoading] = useState(false)
+  const [isRedirecting, setIsRedirecting] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
 
@@ -52,9 +52,10 @@ export default function PageRegister() {
       const data = await response.json()
 
       if (response.ok) {
+        setIsRedirecting(true)
         toast({
           title: "Te has registrado correctamente",
-          description: `Bienvenido a CloudingDrive, ${data.username}. Tu cuenta ha sido creada correctamente, ahora puedes iniciar sesión.`,
+          description: `Bienvenido a CloudingDrive, ${data.userData.username}. Tu cuenta ha sido creada correctamente, ahora puedes iniciar sesión.`,
           duration: 3000,
         })
         // Redireccionar al usuario a la página de inicio de sesión con un delay de 3 segundos
@@ -72,13 +73,12 @@ export default function PageRegister() {
         description: error instanceof Error ? error.message : "Hubo un problema al crear tu cuenta. Por favor, intenta de nuevo.",
         variant: "destructive",
       })
-    } finally {
-      // Mantener isLoading en true durante el tiempo adicional de carga
-      setTimeout(() => {
-        setIsLoading(false)
-      }, 5000) // Tiempo adicional de 5 segundos para simular carga
+      setIsLoading(false)
+      setIsRedirecting(false)
     }
   }
+  const isButtonLoading = isLoading || isRedirecting;
+
   return (
     <div className="flex-col place-content-center min-h-screen">
       <div className="flex items-center justify-center animate-fade-down animate-once animate-duration-200 animate-delay-100 animate-ease-out animate-normal animate-fill-backwards">
@@ -98,6 +98,7 @@ export default function PageRegister() {
               <FormField
                 control={form.control}
                 name="username"
+                disabled={isButtonLoading}
                 render={({ field }) => (
                   <FormItem className="animate-fade-left animate-once animate-duration-[80ms] animate-delay-[200ms] animate-ease-out animate-normal animate-fill-backwards">
                     <FormLabel>Username</FormLabel>
@@ -111,6 +112,7 @@ export default function PageRegister() {
               <FormField
                 control={form.control}
                 name="nombre"
+                disabled={isButtonLoading}
                 render={({ field }) => (
                   <FormItem className="animate-fade-left animate-once animate-duration-[80ms] animate-delay-[400ms] animate-ease-out animate-normal animate-fill-backwards">
                     <FormLabel>Nombre</FormLabel>
@@ -124,6 +126,7 @@ export default function PageRegister() {
               <FormField
                 control={form.control}
                 name="apellido"
+                disabled={isButtonLoading}
                 render={({ field }) => (
                   <FormItem className="animate-fade-left animate-once animate-duration-[80ms] animate-delay-[600ms] animate-ease-out animate-normal animate-fill-backwards">
                     <FormLabel>Apellido</FormLabel>
@@ -137,6 +140,7 @@ export default function PageRegister() {
               <FormField
                 control={form.control}
                 name="email"
+                disabled={isButtonLoading}
                 render={({ field }) => (
                   <FormItem className="animate-fade-left animate-once animate-duration-[80ms] animate-delay-[800ms] animate-ease-out animate-normal animate-fill-backwards">
                     <FormLabel>Correo Electrónico</FormLabel>
@@ -150,6 +154,7 @@ export default function PageRegister() {
               <FormField
                 control={form.control}
                 name="password"
+                disabled={isButtonLoading}
                 render={({ field }) => (
                   <FormItem className="animate-fade-left animate-once animate-duration-[80ms] animate-delay-[1000ms] animate-ease-out animate-normal animate-fill-backwards">
                     <FormLabel>Contraseña</FormLabel>
@@ -177,6 +182,7 @@ export default function PageRegister() {
               <FormField
                 control={form.control}
                 name="plan"
+                disabled={isButtonLoading}
                 render={({ field }) => (
                   <FormItem className="animate-fade-left animate-once animate-duration-[80ms] animate-delay-[1200ms] animate-ease-out animate-normal animate-fill-backwards">
                     <FormLabel>Plan de Suscripción</FormLabel>
@@ -198,20 +204,13 @@ export default function PageRegister() {
               />
             </CardContent>
             <CardFooter className="flex-col animate-fade-up animate-once animate-duration-300 animate-delay-[1300ms] animate-ease-in-out animate-normal animate-fill-backwards">
-              <Button
-                className="w-full hover:bg-green-600 hover:text-white"
-                type="submit"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Registrando...
-                  </>
-                ) : (
-                  "Registrarse"
-                )}
-              </Button>
+              <LoadingButton
+                isLoading={isLoading}
+                isRedirecting={isRedirecting}
+                disabled={isButtonLoading}
+                >
+                  Registrarse
+              </LoadingButton>
               <div className="mt-4 text-center text-sm">
                 ¿Si ya tienes una cuenta?{" "}
                 <Link href="/login" className="underline" prefetch={false}>

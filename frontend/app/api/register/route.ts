@@ -15,15 +15,13 @@ export async function POST(request: Request) {
     });
     
     if (fastapiResponse.status == 400){
-      return NextResponse.json({invalidCredentials : "Username or Email Exists"} , {status : 400});
-    }
-    if (fastapiResponse.status == 200){
-      return NextResponse.json({planError : "Plan selected Invalid"})
+      return NextResponse.json({invalidCredentials : "El usuario o contraseña no son válidos"} , {status : 400});
     }
 
-    const fastapiJson = await fastapiResponse.json();
+    const userData= await fastapiResponse.json();
     
-    return NextResponse.json({fastapiJson} , {status : 200});
+    return NextResponse.json({userData} , {status : 201});
+
   } catch (error) {
     console.error('Error al registrar usuario:', error);
     return NextResponse.json({ reason: 'Error interno del servidor' }, { status: 500 });
