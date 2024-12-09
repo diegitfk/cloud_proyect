@@ -12,9 +12,11 @@ import FolderIcon from "@/public/icons/foldericon.svg";
 import { Ellipsis } from "lucide-react";
 import { ShareDialog } from './ShareDialog';
 import useDriveState from '@/states/useDriveState';
+import MoveDialog from './DialogMoveTo';
+import { url } from 'inspector';
 
 // Type for Drive Item
-type DriveItem = {
+export type DriveItem = {
   id: string;
   name: string;
   type: "folder" | "file";
@@ -41,22 +43,38 @@ const fetcher = async (url: string, path: string): Promise<DriveItem[]> => {
   return data.tree;
 };
 
-const CardsDrive = () => {
+const fetcherSubdirs = async (url: string) => {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error('Error al cargar las rutas');
+  }
+  return response.json();
+};
+const CardsDrive = ({onTrash} : {onTrash : boolean}) => {
   const { getCurrentPath, setPath } = useDriveState();
   const router = useRouter();
   const pathname = usePathname();
-  const currentPath = getCurrentPath();
-  const { data, error, isLoading } = useSWR(['/api/tree', currentPath], ([url, path]) => fetcher(url, path), {
-    refreshInterval: 10000,
+  const currentPath = getCurrentPath(); // Usamos getCurrentPath para obtener el path normalizado
+  let urlFetching = onTrash ? '/api/trash' :  '/api/tree'
+  const { data, error, isLoading } = useSWR([urlFetching, currentPath], ([url, path]) => fetcher(url, path), {
+    refreshInterval: 5000, // Refresca cada 5 segundos
     revalidateOnFocus: true,
+  });
+  const { data: subdirsData, error: subdirsError, isLoading: subdirsLoading } = useSWR(['/api/subdirs', fetcherSubdirs], ([url]) => fetcherSubdirs(url) , {
+    refreshInterval : 3000,
+    revalidateOnFocus : true
   });
 
   useEffect(() => {
-    const pathFromUrl = pathname.replace('/drive', '').replace(/^\/+|\/+$/g, '');
+    const pathFromUrl = onTrash ? pathname.replace('/drive/trash', '').replace(/^\/+|\/+$/g, '') : pathname.replace('/drive', '').replace(/^\/+|\/+$/g, '');
     setPath(pathFromUrl);
   }, [pathname, setPath]);
 
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  //Estados Asociados a mover recursos
+  const [moveDialogOpen, setMoveDialogOpen] = useState(false); //Activar el Dialog
+  const [directories, setDirectories] = useState<string[]>([]); // Rutas de destino a mover
+  //Estados Asociados a card Drive
   const [selectedItem, setSelectedItem] = useState<DriveItem | null>(null);
 
   async function downloadFolder(folderName: string) {
@@ -138,8 +156,11 @@ const CardsDrive = () => {
     downloadFile('example.txt');
   };
 
+
+
   const handleFolderClick = (folderPath: string) => {
-    router.push(`/drive/${folderPath}`);
+    let pathPush = onTrash ? `/drive/trash/${folderPath}` : `/drive/${folderPath}`
+    router.push(pathPush);
   };
 
   const handleShareClick = (event: React.MouseEvent, item: DriveItem) => {
@@ -147,7 +168,58 @@ const CardsDrive = () => {
     setSelectedItem(item);
     setShareDialogOpen(true);
   };
+  
+  const handleDeleteClick = async (event : React.MouseEvent , item : DriveItem) => {
+    event.stopPropagation()
+    event.preventDefault();
+    const fetchingDeleteUrl = `/api/del_folder`
+    const sanitizedPath = item.path.startsWith('/') ? item.path.slice(1) : item.path;
+    const body = {path_on_folder : sanitizedPath};
+    try{
+      const response = await fetch(fetchingDeleteUrl , {
+        method : 'DELETE',
+        headers : {
+          'Content-Type' : 'application/json'
+        },
+        body : JSON.stringify(body)
+      })
+    }
+    catch{
+      console.log("Error al eliminar")
+    }
+  }
 
+  const handleMoveClick = (event : React.MouseEvent , item: DriveItem) => {
+    event.stopPropagation()
+    setSelectedItem(item); // Establece el ítem seleccionado
+    setMoveDialogOpen(true); // Abre el diálogo de mover
+  };
+
+  const handleMove = (newPath: string) => {
+    if (selectedItem) {
+      // Realizar la petición para mover el archivo o carpeta
+      const sanitizedItemPath = selectedItem.path.startsWith('/') ? selectedItem.path.slice(1) : selectedItem.path;
+      const body = { path_resource: sanitizedItemPath, path_move_to : newPath };
+
+      fetch('/api/move', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      })
+        .then((response) => {
+          if (response.ok) {
+            // Cerrar el diálogo
+            setMoveDialogOpen(false);
+          } else {
+            console.error("Error al mover el archivo o carpeta");
+          }
+        })
+        .catch((error) => console.error("Error al hacer la solicitud", error));
+    }
+  };
+  
   if (isLoading) {
     return (
       <div className="absolute inset-0 flex items-center justify-center">
@@ -245,6 +317,17 @@ const CardsDrive = () => {
           itemPath={selectedItem.path}
         />
       )}
+      {
+        selectedItem && (
+          <MoveDialog 
+            isOpen={moveDialogOpen}
+            onClose={() => setMoveDialogOpen(false)}
+            onMove={handleMove}
+            directories={subdirsData}
+            item={selectedItem}
+          />
+        )
+      }
     </>
   );
 };

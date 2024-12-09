@@ -3,7 +3,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import NavBarDrive from "@/components/custom/NavBarDrive";
 import PageDrive from "./[[...path]]/page";
 import PageShared from "./shared/page";
-import PageTrash from "./trash/page";
+import PageTrash from "./trash/[[...trashPath]]/page";
 import SideBar from "@/components/custom/SideBar";
 import useDriveState from '@/states/useDriveState';
 import { useState } from "react";

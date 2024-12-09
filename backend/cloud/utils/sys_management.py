@@ -90,6 +90,27 @@ class SysManagement:
         tree_structure = StructureCurrentPath(current_path=base_path)
         tree_structure.current_items_on_path()
         return jsonable_encoder(tree_structure.current_items)
+    
+    async def get_current_level_trash(self , path_on_folder : Optional[Path] = None) -> Dict[str , Any]:
+        if path_on_folder is None:
+            base_path = self.cloud_builder.current_path / '.trash/'
+        else:
+            base_path = self.cloud_builder.current_path / '.trash/' / path_on_folder
+        tree_structure = StructureCurrentPath(current_path=base_path)
+        tree_structure.current_items_on_path()
+        return jsonable_encoder(tree_structure.current_items)
+    
+    def get_subdirs(self) -> List[str]:
+        subdirs = []
+        base_path = str(self.cloud_builder.current_path)
+        for current_path, dirs, archivos in os.walk(base_path):
+            if current_path.startswith(base_path):
+                for directorio in dirs:
+                    if not directorio.startswith('.'):
+                        subdir_path = os.path.join(current_path, directorio)
+                        subdirs.append(os.path.relpath(subdir_path, base_path))
+        subdirs.append('')
+        return subdirs
 
     def src_download(self , name_file : str) -> Path:
         base = self.cloud_builder.current_path
@@ -119,6 +140,32 @@ class SysManagement:
             structure.current_items_on_path()
             newItem = structure.get_file_on_current_path(name_new_dir)
             return jsonable_encoder(newItem)
+    
+    async def mv_resource(self, path_on_folder: Path, destiny_resource_path: Path):
+        if not path_on_folder or not destiny_resource_path:
+            raise HTTPException(status_code=400, detail="Falta información para mover el recurso")
+
+        root_path = self.cloud_builder.current_path
+        current_resource_path = root_path / path_on_folder
+        destiny_resource_path = root_path / destiny_resource_path
+
+        if not current_resource_path.exists():
+            raise HTTPException(status_code=404, detail=f"El recurso {current_resource_path} no existe")
+        
+        if current_resource_path == destiny_resource_path:
+            raise HTTPException(status_code=400, detail="La ruta de destino es la misma que la de origen")
+
+        if not str(current_resource_path).startswith(str(root_path)) or not str(destiny_resource_path).startswith(str(root_path)):
+            raise HTTPException(status_code=400, detail="No se puede mover el recurso fuera del directorio raíz")
+
+        if destiny_resource_path.exists() and destiny_resource_path.is_dir():
+            destiny_resource_path = destiny_resource_path / current_resource_path.name
+        
+        try:
+            # Ejecutar el comando de mover el recurso
+            await self.__run_async_command(f"mv {str(current_resource_path)} {str(destiny_resource_path)}")
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error al mover el recurso: {str(e)}")
 
     async def upload_files(self , files : List[UploadFile] , path_on_folder : Optional[Path] = None) -> Dict[str , Any]:
         copy_tasks = []
@@ -164,24 +211,28 @@ class SysManagement:
             raise HTTPException(status_code=404, detail="El archivo ya ha sido eliminado o no existe")
 
         
-    def delete_folder(self , path_folder : Optional[Path] = None) -> float:
+    async def delete_or_mv_folder(self , path_folder : Optional[Path] = None) -> Dict[str , bool]:
         if path_folder is None:
             raise Exception("Set a folder")
         base_path = self.cloud_builder.build_path(path_folder)
         if not base_path.is_dir():
             raise Exception("This path pointer not folder")
         try:
+            #----------- Logica de eliminado de carpetas vacias del sistema. ------------------
             structure = StructureCurrentPath(current_path=base_path)
             structure.current_items_on_path()
-            shutil.rmtree(str(base_path))
-            free_space = sum(item.size for item in structure.current_items)
-            return jsonable_encoder({"tree_rm" : structure.current_items, "free" : free_space })
+            if len(structure.current_items) != 0:
+                await self.__run_async_command(f"mv {base_path} {self.cloud_builder.current_path}/.trash/")
+                return {"deleted" : False , "moved" : True}
+            else:
+                shutil.rmtree(str(base_path))
+                return {"deleted" : True , "moved" : False}
+            #----------------------------------------------------------------------------------
         except FileNotFoundError:
             raise HTTPException(status_code=404, detail="El directorio ya ha sido eliminado o no existe")
 
         except PermissionError:
             raise HTTPException(status_code=403 , detail="No posees permisos")
-        ...
     
     def __generate_uuid_symlink(self) -> uuid.UUID:
         return uuid.uuid4()
@@ -258,8 +309,8 @@ class SysManagement:
             zip_name = resource_path.name + ".zip"
             zip_path_destino = symlink_path_destination / Path(f"{zip_name}") #Para que se cree dentro de la carpeta de transferidos del usuario receptor
             with zipfile.ZipFile(zip_path_destino , "w") as zipf:
-                for file in resource_path.glob("*"):
-                    zipf.write(file , arcname=file.name)
+                for file in resource_path.rglob("*"):
+                    zipf.write(file , arcname=file.relative_to(resource_path))
         else:
             symlink_path_destination_file = symlink_path_destination / f"{str(resource_path.name)}"
             shutil.copyfile(resource_path , symlink_path_destination_file)

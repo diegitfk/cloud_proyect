@@ -50,6 +50,15 @@ async def get_file(
         filename=file_path.name
         )
 
+@app.get("/subdirs")
+async def get_subdirs(
+    token : Annotated[TokenData , Depends(auth_schema)],
+    session_db = Depends(start_session_db)
+    ):
+    user = await User.find_one(User.username == token.username , fetch_links=True)
+    sys_manager = SysManagement(root=_env_values.ROOT_CLOUD_PATH , folder=user.folder)
+    return sys_manager.get_subdirs()
+
 @app.post("/tree")
 async def get_current_level_items(
     token : Annotated[TokenData , Depends(auth_schema)] , 
@@ -59,6 +68,16 @@ async def get_current_level_items(
     user = await User.find_one( User.username == token.username, fetch_links=True)
     sys_manager = SysManagement(root=_env_values.ROOT_CLOUD_PATH , folder=user.folder)
     return await sys_manager.get_current_level(path.path_on_folder)
+
+@app.post("/trash")
+async def get_current_level_trash(
+    token : Annotated[TokenData , Depends(auth_schema)],
+    path : PathOperation,
+    session_db = Depends(start_session_db)
+):
+    user = await User.find_one( User.username == token.username, fetch_links=True)
+    sys_manager = SysManagement(root=_env_values.ROOT_CLOUD_PATH , folder=user.folder)
+    return await sys_manager.get_current_level_trash(path.path_on_folder)
 
 @app.post("/rename_dir/{new_name_dir}")
 async def rename_dir(
@@ -97,7 +116,19 @@ async def recept_files(
     uploadfiles = await sys_manager.upload_files(files , path)
     return uploadfiles
 
-@app.delete("/dir")
+@app.post("/mv_resource")
+async def move_resource(
+    token : Annotated[TokenData , Depends(auth_schema)] , 
+    path_resource : Annotated[PathSys , Body(...)], 
+    path_move_to : Annotated[PathSys , Body(...)],
+    session_db = Depends(start_session_db)
+    ):
+    user = await User.find_one(User.username == token.username , fetch_links=True)
+    sys_manager = SysManagement(root=_env_values.ROOT_CLOUD_PATH , folder=user.folder)
+    await sys_manager.mv_resource(path_resource , path_move_to)
+    return JSONResponse(content={"info" : "Recurso Movido Exitosamente" , "from" : str(path_resource) , "to" : str(path_move_to)})
+
+@app.delete("/folder")
 async def delete_folder_tree(
     token : Annotated[TokenData , Depends(auth_schema)], 
     path : PathOperation , 
@@ -105,7 +136,7 @@ async def delete_folder_tree(
     ):
     user = await User.find_one(User.username == token.username , fetch_links=True) 
     sys_manager = SysManagement(root=_env_values.ROOT_CLOUD_PATH , folder=user.folder)
-    delete_folder_info = sys_manager.delete_folder(path_folder=path.path_on_folder)
+    delete_folder_info = await sys_manager.delete_or_mv_folder(path_folder=path.path_on_folder)
     return JSONResponse(content=delete_folder_info)
 
 @app.delete("/file/{filename}")
