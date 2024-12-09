@@ -4,6 +4,7 @@ import NavBarLayout from "@/components/custom/NavBarLayout"
 import { BriefcaseIcon, DatabaseIcon, HeadphonesIcon, PieChartIcon, RocketIcon, TabletsIcon } from "lucide-react"
 import PlanPricing from "@/components/custom/PlanPricing"
 import BackgroundParticlesHome from "@/components/custom/Particles/BackgroundParticlesHome"
+import { IconCloudTech } from "@/components/custom/GlobeTech"
 
 export default function PageHome() {
   return (
@@ -70,6 +71,18 @@ export default function PageHome() {
               </Card>
             </div>
           </div>
+        </section>
+        <section className="w-full px-10 py-5 mb-5 min-h-screen select-none">
+          <div className="flex flex-col items-center justify-center space-y-4 text-center py-5 mb-8">
+            <div className="space-y-2">
+              <h2 className="text-3xl font-bold tracking-wide sm:text-5xl">Nuestras Tecnologías de Desarrollo</h2>
+              <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                CloudingDrive está desarrollado en tecnologías de código abierto y de alta calidad que ofrecen una experiencia de usuario agradable, asimismo un enfoque en una experiencia de desarrollo rápida y eficiente.
+              </p>
+            </div>
+            <IconCloudTech />
+          </div>
+          
         </section>
         <section className="w-full px-10 py-5 mb-5 min-h-screen select-none">
           <div className="flex flex-col items-center justify-center space-y-4 text-center py-5 mb-8">
