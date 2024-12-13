@@ -3,9 +3,7 @@ from fastapi import Request
 from fastapi.exceptions import HTTPException
 from fastapi.responses import JSONResponse
 from models.documents import User , Folder, PendingShared
-from models.db import engine
 from utils.security import _env_values
-from beanie import init_beanie
 from models.models import NewAccount, EventCredentials
 from typing import Annotated
 from datetime import timedelta, datetime, timezone
@@ -15,13 +13,6 @@ import asyncio
 
 webhook_router = APIRouter(prefix="/webhooks")
 auth_transaction_for = dict()
-
-async def start_session_db():
-    db = init_beanie(database=engine["cloud_db"] , document_models=[User , Folder , PendingShared])
-    try:
-        yield await db
-    finally:
-        db.close()
 
 def verify_credentials_transaction(request : Request) -> EventCredentials:
     host = request.client.host #En caso de que genere problemas esta variable hacer uso del encabezado X-Forwarded-For
@@ -53,7 +44,7 @@ async def key_for_emisor(request : Request):
     return JSONResponse(content={"api_key" : api_key , "id_transaction" : str(id_transaction)} , status_code=status.HTTP_200_OK)
 
 @webhook_router.post("/configure_dir_account")
-async def config_new_account(new_account : NewAccount , transaction_credentials : Annotated[EventCredentials , Depends(verify_credentials_transaction)] , session_db = Depends(start_session_db)):
+async def config_new_account(new_account : NewAccount , transaction_credentials : Annotated[EventCredentials , Depends(verify_credentials_transaction)]):
     #Validamos que ese usuario ya no se encuentre registrado
     #Registramos una instancia de la carpeta root y del usuario sin guardar en bd
     new_root_folder = Folder(
@@ -92,4 +83,5 @@ async def config_new_account(new_account : NewAccount , transaction_credentials 
     await new_root_folder.save()
     await new_user.save()
     return JSONResponse(content={"operation" : "success"}, status_code=status.HTTP_201_CREATED)
+
 

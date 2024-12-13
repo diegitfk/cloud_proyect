@@ -7,7 +7,6 @@ from models.documents import PendingShared , User , Folder , PendingShareView, U
 from models.models import ShareResourceRequest , StateShare
 from utils.sys_management import SysManagement, SysManagementShareResources
 from utils.security import JwtFlow , _env_values , TokenData
-from routers.webhooks import start_session_db
 from pathlib import Path
 import logging
 import json
@@ -87,7 +86,6 @@ async def sub_to_connection(websocket : WebSocket , token : TokenData = Depends(
 @share_router.get("/pending_share")
 async def get_all_pending_shareds(
     token : TokenData = Depends(auth_schema),
-    session_db = Depends(start_session_db)
     ):
     """
         Función encargada de mostrar todas las solicitudes para compartir archivos pendientes 
@@ -109,7 +107,6 @@ async def get_all_pending_shareds(
 @share_router.get("/transfers")
 async def transfers_controller(
         token : Annotated[TokenData , Depends(auth_schema)],
-        session_db = Depends(start_session_db)
     ):
     user = await User.find_one(User.username == token.username , fetch_links=True)
     transfer_manager = SysManagementShareResources(_env_values.ROOT_TRANSFER_PATH , user.folder)
@@ -119,7 +116,6 @@ async def transfers_controller(
 async def download_resource(
     name : Annotated[str , Query(...)],
     token : Annotated[TokenData , Depends(auth_schema)] , 
-    session_db = Depends(start_session_db)
     ):
     user = await User.find_one( User.username == token.username, fetch_links=True)
     transfer_manager = SysManagementShareResources(_env_values.ROOT_TRANSFER_PATH , user.folder)
@@ -133,9 +129,8 @@ async def download_resource(
 @share_router.get("/users")
 async def get_users_info(
         token : Annotated[TokenData , Depends(auth_schema)],
-        session_db = Depends(start_session_db)
     ):
-    users = await User.find_all().project(UserView).to_list()
+    users = await User.find(User.username != token.username).project(UserView).to_list()
     return JSONResponse(content={"users" : jsonable_encoder(users)})
 
 
@@ -143,7 +138,6 @@ async def get_users_info(
 async def transfer_resource_req(
     request_share_resource : ShareResourceRequest,
     token : TokenData = Depends(auth_schema),
-    session_db = Depends(start_session_db)
     ):
     """
         Controller encargado de recibir un archivo o una carpeta del usuario y procesarla 
@@ -177,7 +171,6 @@ async def transfer_resource_req(
 async def accept_file_req(
         id_pending : Annotated[str , Path()],
         token : Annotated[TokenData , Depends(auth_schema)],
-        session_db = Depends(start_session_db)
     ):
     """
         Controller encargado de cambiar el estado de la solicitud pendiente a "ACEPTADO"
@@ -207,7 +200,6 @@ async def accept_file_req(
 async def reject_file_req(
         id_pending : str ,
         token : TokenData = Depends(auth_schema),
-        session_db = Depends(start_session_db) 
     ):
     """
         Controller encargado de cambiar el estado de la solicitud pendiente a "RECHAZADO"
@@ -239,7 +231,6 @@ async def reject_file_req(
 async def share_resource_controller(
         id_pending : Annotated[str , Path()],
         token : Annotated[TokenData , Depends(auth_schema)],
-        session_db = Depends(start_session_db)
     ):
     pending_share = await PendingShared.get(document_id=id_pending , fetch_links=True)
 

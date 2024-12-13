@@ -29,17 +29,26 @@ const useDriveState = create<DriveState>((set, get) => ({
   getCurrentPath: () => {
     const state = get();
     if (!state.path) return '';
-    return state.path.startsWith('/') ? state.path : `/${state.path}`;
+    // Decodificar la ruta actual
+    const decodedPath = decodeURIComponent(state.path);
+    return decodedPath.startsWith('/') ? decodedPath : `/${decodedPath}`;
   },
 
-  setPath: (newPath) => set({ 
-    path: newPath === '/' ? '' : newPath 
-  }),
+  setPath: (newPath) => {
+    // Decodificar la nueva ruta antes de establecerla
+    const decodedPath = decodeURIComponent(newPath);
+    set({ path: decodedPath === '/' ? '' : decodedPath });
+  },
 
-  navigateToFolder: (folderName) =>
+  navigateToFolder: (folderName) => {
+    // Decodificar el nombre de la carpeta antes de usarlo
+    const decodedFolderName = decodeURIComponent(folderName);
     set((state) => ({
-      path: !state.path ? folderName : `${state.path}/${folderName}`
-    })),
+      path: !state.path
+        ? decodedFolderName
+        : `${state.path}/${decodedFolderName}`
+    }));
+  },
 
   setNewFolderName: (name) => set({ newFolderName: name }),
 

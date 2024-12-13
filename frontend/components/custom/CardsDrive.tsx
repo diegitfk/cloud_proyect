@@ -260,8 +260,7 @@ const CardsDrive = ({ onTrash }: { onTrash: boolean }) => {
                     {!onTrash && (<DropdownMenuItem onClick={(e) => handleShareClick(e, element)}>Compartir</DropdownMenuItem>)}
                     {!onTrash && (<DropdownMenuItem onClick={(e) => handleMoveClick(e, element)}>Mover a</DropdownMenuItem>)}
                     {!onTrash && element.type == 'folder' && (<DropdownMenuItem className='text-red-500' onClick={(e) => handleDeleteClick(e, element)}>Eliminar</DropdownMenuItem>)}
-                    <DropdownMenuItem>Renombrar</DropdownMenuItem>
-                    {element.type === 'file' && (
+                    {!onTrash && element.type === 'file' &&  (
                       <DropdownMenuItem
                         onClick={(e) => {
                           e.stopPropagation(); // Previene que se abra la carpeta/archivo

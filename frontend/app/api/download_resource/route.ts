@@ -12,14 +12,14 @@ export async function GET(request: NextRequest) {
 
     const cookieHeader = `${sessionCookie.name}=${sessionCookie.value}`;
     const url = new URL(request.url);
-    const nameFile = url.searchParams.get("name");
+    const nameFile = url.searchParams.get("namefile");
 
     if (!nameFile) {
       return NextResponse.json({ error: "File name is required" }, { status: 400 });
     }
 
     const responseBackend = await fetch(
-      `http://localhost:8000/share/download_resource/?name=${encodeURIComponent(nameFile)}`,
+      `http://localhost:8000/cloud/share/download_resource/?name=${encodeURIComponent(nameFile)}`,
       {
         method: "GET",
         credentials: "include",

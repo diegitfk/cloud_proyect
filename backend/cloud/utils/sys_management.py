@@ -127,7 +127,7 @@ class SysManagement:
         key_sys = str(uuid.uuid4()) #Este será el atributo extendido de la carpeta
         if path_on_folder is None:
             structure = StructureCurrentPath(current_path=self.cloud_builder.current_path)
-            await self.__run_async_command(f"mkdir -p {str(self.cloud_builder.current_path / name_new_dir)}")
+            await self.__run_async_command(f"mkdir -p '{str(self.cloud_builder.current_path / name_new_dir)}'")
             await self.set_attr(str(self.cloud_builder.current_path / name_new_dir) , "key" , key_sys)
             structure.current_items_on_path()
             newItem = structure.get_file_on_current_path(name_new_dir)
@@ -135,7 +135,7 @@ class SysManagement:
         else:
             path_new_dir = self.cloud_builder.build_path(Path(path_on_folder))
             structure = StructureCurrentPath(current_path=path_new_dir)
-            await self.__run_async_command(f"mkdir -p {str(path_new_dir / name_new_dir)}")
+            await self.__run_async_command(f"mkdir -p '{str(path_new_dir / name_new_dir)}'")
             await self.set_attr(str(path_new_dir / name_new_dir) , "key" , key_sys) #extendemos el atributo de la carpeta
             structure.current_items_on_path()
             newItem = structure.get_file_on_current_path(name_new_dir)
@@ -163,29 +163,38 @@ class SysManagement:
         
         try:
             # Ejecutar el comando de mover el recurso
-            await self.__run_async_command(f"mv {str(current_resource_path)} {str(destiny_resource_path)}")
+            await self.__run_async_command(f"mv '{str(current_resource_path)}' '{str(destiny_resource_path)}'")
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error al mover el recurso: {str(e)}")
     async def get_directory(self) -> float:
         try:
             result = await self.__run_async_command(f"du -sh {self.cloud_builder.current_path}")
             size_str = result.decode().split()[0]
-
-            # Convierte el tamaño a gigabytes según el sufijo y redondea a 2 decimales en formato decimal
-            if size_str.endswith('G'):
-                return float(f"{round(float(size_str[:-1]), 2):.2f}")
-            elif size_str.endswith('M'):
-                return float(f"{round(float(size_str[:-1]) / 1024, 2):.2f}")
-            elif size_str.endswith('K'):
-                return float(f"{round(float(size_str[:-1]) / (1024 * 1024), 2):.2f}")
-            elif size_str.endswith('T'):
-                return float(f"{round(float(size_str[:-1]) * 1024, 2):.2f}")
-            else:
-                raise ValueError(f"Tamaño desconocido: {size_str}")
+            logger.info(f"Espacio en STR: [{size_str}]")
+            
+            # Define una función auxiliar para convertir tamaños
+            def convert_size_to_gb(size: str) -> float:
+                if size.endswith('G'):
+                    return round(float(size[:-1]), 2)
+                elif size.endswith('M'):
+                    return round(float(size[:-1]) / 1024, 2)
+                elif size.endswith('K'):
+                    return round(float(size[:-1]) / (1024 * 1024), 2)
+                elif size.endswith('T'):
+                    return round(float(size[:-1]) * 1024, 2)
+                elif size.isdigit():  # Maneja valores en bytes
+                    return round(float(size) / (1024 * 1024 * 1024), 2)
+                else:
+                    raise ValueError(0.0)
+            
+            # Convierte el tamaño y devuelve el resultado
+            size_in_gb = convert_size_to_gb(size_str)
+            logger.info(f"Espacio en GB: {size_in_gb}")
+            return size_in_gb
 
         except Exception as e:
+            logger.error(f"Error al obtener el espacio del directorio: {str(e)}")
             raise HTTPException(status_code=400, detail=str(e))
-
 
     async def get_plan_size(self) -> float:
         try:
@@ -258,7 +267,7 @@ class SysManagement:
             structure = StructureCurrentPath(current_path=base_path)
             structure.current_items_on_path()
             if len(structure.current_items) != 0:
-                await self.__run_async_command(f"mv {base_path} {self.cloud_builder.current_path}/.trash/")
+                await self.__run_async_command(f"mv '{base_path}' '{self.cloud_builder.current_path}/.trash/'")
                 return {"deleted" : False , "moved" : True}
             else:
                 shutil.rmtree(str(base_path))

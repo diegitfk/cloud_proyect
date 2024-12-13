@@ -1,72 +1,50 @@
 "use client";
 
 import * as React from "react";
-import { Progress } from "@/components/ui/progress";
+import useSWR from "swr";
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export function Storage_bar() {
+  // Fetch estático para plan_memory (no necesita revalidarse)
+  const { data: planData, error: planError } = useSWR("/api/plan_memory", fetcher, { revalidateOnFocus: false });
+
+  // Fetch dinámico para size_dir (revalidación automática)
+  const { data: sizeData, error: sizeError } = useSWR("/api/size_dir", fetcher);
+
+  // Estado local para controlar el progreso con animación
   const [progress, setProgress] = React.useState(0);
-  const [sizeUsed, setSizeUsed] = React.useState<number | null>(null);
-  const [limitStr, setLimitStr] = React.useState<number | null>(null);
 
-  // Evitar el null
-  const limit = limitStr ?? 2.0;
+  // Parsear los datos
+  const sizeUsed = sizeData?.newDir ? parseFloat(sizeData.newDir) : null;
+  const limitStr = planData?.newDir ? parseFloat(planData.newDir) : 2.0;
 
-  React.useEffect(() => {
-    // FUNCION PARA OBTENER EL TAMAÑO DEL DIRECTORIO
-    async function getSize() {
-      try {
-        const response = await fetch("/api/size_dir");
-        const data = await response.json();
-
-        if (data?.newDir !== undefined) {
-          const usedSize = parseFloat(data.newDir);
-          setSizeUsed(usedSize);
-        } else if (response.status === 401) {
-          console.log("Expire Credentials");
-        } else if (response.status === 403) {
-          console.log("Access Denied");
-        }
-      } catch (error) {
-        console.error("Error al obtener el tamaño del directorio:", error);
-      }
-    }
-
-    // FUNCION PARA OBTENER LA MEMORIA LIMITE DEL PLAN
-    async function getPlanMemory() {
-      try {
-        const response = await fetch("/api/plan_memory");
-        const data = await response.json();
-
-        if (data?.newDir !== undefined) {
-          const planSize = parseFloat(data.newDir); 
-          setLimitStr(planSize); 
-        } else if (response.status === 401) {
-          console.log("Expire Credentials");
-        } else if (response.status === 403) {
-          console.log("Access Denied");
-        }
-      } catch (error) {
-        console.error("Error al obtener el tamaño del plan:", error);
-      }
-    }
-
-    getPlanMemory();
-    getSize();
-  }, []);
-
+  // Actualización gradual del progreso
   React.useEffect(() => {
     if (sizeUsed !== null && limitStr !== null) {
-      setProgress((sizeUsed / limitStr) * 100);
+      const newProgress = (sizeUsed / limitStr) * 100;
+      setProgress(newProgress);
     }
   }, [sizeUsed, limitStr]);
 
   const progressFillColor = progress >= 80 ? "bg-red-500" : "bg-white";
 
+  // Manejo de errores
+  if (sizeError || planError) {
+    console.error("Error fetching data:", sizeError || planError);
+    return <div>Error al cargar los datos</div>;
+  }
+
+  // Estado de carga
+  if (!sizeData || !planData) {
+    return <div>Cargando...</div>;
+  }
+
   return (
     <div className="ps-3 pt-10">
-      <div className="relative w-[90%] h-2 rounded-full bg-gray-500">
+      <div className="relative w-[90%] h-2 rounded-full bg-gray-500 overflow-hidden">
         <div
-          className={`h-full ${progressFillColor} rounded-full`}
+          className={`h-full ${progressFillColor} rounded-full transition-all duration-500 ease-in-out`}
           style={{ width: `${progress}%` }}
         />
       </div>

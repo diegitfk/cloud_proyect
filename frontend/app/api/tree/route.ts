@@ -14,7 +14,6 @@ export async function POST(request: NextRequest) {
 
         // Obtener el path del cuerpo de la solicitud
         const { path_on_folder } = await request.json();
-
         // Asegurarse de que path_on_folder sea siempre una cadena
         const sanitizedPath = (path_on_folder || "").replace(/^\//, "");
 
