@@ -7,7 +7,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export function Storage_bar() {
   // Fetch estático para plan_memory (no necesita revalidarse)
-  const { data: planData, error: planError } = useSWR("/api/plan_memory", fetcher, { revalidateOnFocus: false });
+  const { data: planData, error: planError } = useSWR("/api/plan_memory", fetcher, { revalidateOnFocus: false , refreshInterval : 3000 });
 
   // Fetch dinámico para size_dir (revalidación automática)
   const { data: sizeData, error: sizeError } = useSWR("/api/size_dir", fetcher);
